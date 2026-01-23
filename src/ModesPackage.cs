@@ -12,10 +12,29 @@ namespace Modes
     [InstalledProductRegistration(Vsix.Name, Vsix.Description, Vsix.Version)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(PackageGuids.ModesString)]
-    [ProvideOptionPage(typeof(OptionsProvider.GeneralOptions), "Modes", "General", 0, 0, true, SupportsProfiles = true)]
+    [ProvideOptionPage(typeof(OptionsProvider.GeneralOptions), Vsix.Name, "General", 0, 0, true)]
+    [ProvideProfile(typeof(OptionsProvider.GeneralOptions), Vsix.Name, "General", 0, 0, true)]
 
-    // Auto-load when shell is initialized (background load keeps it lightweight)
     [ProvideAutoLoad(Microsoft.VisualStudio.VSConstants.UICONTEXT.ShellInitialized_string, PackageAutoLoadFlags.BackgroundLoad)]
+
+    // Rule-based UI context: Load immediately when a mode is active (checks BaseOptionModel settings store)
+    //[ProvideAutoLoad(PackageGuids.ModeActiveUIContextString, PackageAutoLoadFlags.BackgroundLoad)]
+    //[ProvideUIContextRule(
+    //    PackageGuids.ModeActiveUIContextString,
+    //    name: "Mode Active",
+    //    expression: "ModeActive",
+    //    termNames: new[] { "ActiveModeNme" },
+    //    termValues: new[] { @"UserSettingsStoreQuery:Modes.General\ModeActive" })]
+
+    // Rule-based UI context: Load after delay for backup functionality when no mode is active
+    //[ProvideAutoLoad(PackageGuids.BackupDelayedUIContextString, PackageAutoLoadFlags.BackgroundLoad)]
+    //[ProvideUIContextRule(
+    //    PackageGuids.BackupDelayedUIContextString,
+    //    name: "Backup Delayed",
+    //    expression: "ShellInitialized",
+    //    termNames: new[] { "ShellInitialized" },
+    //    termValues: new[] { Microsoft.VisualStudio.VSConstants.UICONTEXT.ShellInitialized_string },
+    //    delay: 3600000)] // 1 hour delay
     public sealed class ModesPackage : ToolkitPackage
     {
         private bool _wasLowPowerEnabledBySystem;
@@ -23,7 +42,6 @@ namespace Modes
 
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            await VS.MessageBox.ShowAsync("Modes Package Initializing...");
             await this.RegisterCommandsAsync();
 
             // Initialize the ModeManager to restore persisted mode states
@@ -63,7 +81,7 @@ namespace Modes
                 if (e.Mode == PowerModes.StatusChange)
                 {
                     // Check if Windows is in battery saver / power saver mode
-                    bool isWindowsInPowerSaver = IsWindowsInPowerSaverMode();
+                    var isWindowsInPowerSaver = IsWindowsInPowerSaverMode();
 
                     if (isWindowsInPowerSaver && !manager.IsModeActive(ModeType.LowPower))
                     {

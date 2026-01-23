@@ -30,5 +30,12 @@ namespace Modes
         [Description("Minimum time between automatic backups in hours.")]
         [DefaultValue(48)]
         public int BackupIntervalHours { get; set; } = 48;
+
+        /// <summary>
+        /// The currently active mode, if any. Stored as a string for persistence.
+        /// </summary>
+        [Browsable(false)]
+        [DefaultValue(null)]
+        public string ActiveModeName { get; set; }
     }
 }

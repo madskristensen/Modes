@@ -15,6 +15,12 @@ namespace Modes
     {
         public const string ModesString = "7c697c09-64b1-4dc2-ba0b-955215206732";
         public static Guid Modes = new Guid(ModesString);
+
+        public const string ModeActiveUIContextString = "9b2a1c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d";
+        public static Guid ModeActiveUIContext = new Guid(ModeActiveUIContextString);
+
+        public const string BackupDelayedUIContextString = "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d";
+        public static Guid BackupDelayedUIContext = new Guid(BackupDelayedUIContextString);
     }
 
     /// <summary>

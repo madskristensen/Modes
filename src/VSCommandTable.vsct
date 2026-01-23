@@ -9,7 +9,7 @@
   <Commands package="Modes">
     <!-- Menu containing the Modes submenu -->
     <Menus>
-      <Menu guid="Modes" id="ModesSubMenu" priority="0x0100" type="Menu">
+      <Menu guid="Modes" id="ModesSubMenu" priority="0x020" type="Menu">
         <Parent guid="VSMainMenu" id="Tools.OptionsGroup"/>
         <Strings>
           <ButtonText>Modes</ButtonText>
@@ -37,6 +37,8 @@
       <!-- Low Power Mode -->
       <Button guid="Modes" id="LowPowerCommand" priority="0x0100" type="Button">
         <Parent guid="Modes" id="ModeCommandsGroup" />
+        <Icon guid="ImageCatalogGuid" id="FlagRed" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Low power mode</ButtonText>
           <LocCanonicalName>.Modes.LowPower</LocCanonicalName>
@@ -46,6 +48,8 @@
       <!-- Focus Mode -->
       <Button guid="Modes" id="FocusCommand" priority="0x0200" type="Button">
         <Parent guid="Modes" id="ModeCommandsGroup" />
+        <Icon guid="ImageCatalogGuid" id="FlagGreen" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Focus mode</ButtonText>
           <LocCanonicalName>.Modes.Focus</LocCanonicalName>
@@ -55,6 +59,8 @@
       <!-- Performance Mode -->
       <Button guid="Modes" id="PerformanceCommand" priority="0x0300" type="Button">
         <Parent guid="Modes" id="ModeCommandsGroup" />
+        <Icon guid="ImageCatalogGuid" id="FlagPurple" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Performance mode</ButtonText>
           <LocCanonicalName>.Modes.Performance</LocCanonicalName>
@@ -64,6 +70,8 @@
       <!-- Presenter Mode -->
       <Button guid="Modes" id="PresenterCommand" priority="0x0400" type="Button">
         <Parent guid="Modes" id="ModeCommandsGroup" />
+        <Icon guid="ImageCatalogGuid" id="FlagTurquoise" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Presenter mode</ButtonText>
           <LocCanonicalName>.Modes.Presenter</LocCanonicalName>
@@ -107,5 +115,9 @@
       <IDSymbol name="ResetSettingsCommand" value="0x0104" />
       <IDSymbol name="SettingsCommand" value="0x0105" />
     </GuidSymbol>
+
+    <!-- UI Context GUIDs for rule-based autoloading -->
+    <GuidSymbol name="ModeActiveUIContext" value="{9B2A1C3D-4E5F-6A7B-8C9D-0E1F2A3B4C5D}" />
+    <GuidSymbol name="BackupDelayedUIContext" value="{A1B2C3D4-E5F6-7A8B-9C0D-1E2F3A4B5C6D}" />
   </Symbols>
 </CommandTable>

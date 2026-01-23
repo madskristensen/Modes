@@ -6,7 +6,22 @@
     "tags": [ "zen", "performance", "focus", "battery", "power" ]
   },
   "assetFiles": [
-
+    {
+      "pathOnDisk": "art/menu.png",
+      "targetPath": "art/menu.png"
+    },
+    {
+      "pathOnDisk": "art/statusbar.png",
+      "targetPath": "art/statusbar.png"
+    },
+    {
+      "pathOnDisk": "art/settings.png",
+      "targetPath": "art/settings.png"
+    },
+    {
+      "pathOnDisk": "art/restore.png",
+      "targetPath": "art/restore.png"
+    }
   ],
   "overview": "README.md",
   "publisher": "MadsKristensen",

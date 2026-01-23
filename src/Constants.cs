@@ -43,12 +43,6 @@ namespace Modes
             /// <summary>Root folder name under AppData for Modes data.</summary>
             public const string AppDataFolderName = "Modes";
 
-            /// <summary>Settings store collection path for persisted mode state.</summary>
-            public const string SettingsCollectionPath = "Modes";
-
-            /// <summary>Key for storing active modes.</summary>
-            public const string ActiveModesKey = "ActiveModes";
-
             /// <summary>Baseline settings backup filename.</summary>
             public const string BaselineFileName = "baseline.vssettings";
         }

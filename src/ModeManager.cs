@@ -7,10 +7,8 @@ using System.Windows;
 using Community.VisualStudio.Toolkit;
 using EnvDTE80;
 using Microsoft.VisualStudio.Imaging;
-using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Shell.Settings;
 using Task = System.Threading.Tasks.Task;
 
 namespace Modes
@@ -23,12 +21,10 @@ namespace Modes
         private static ModeManager _instance;
         private static readonly object _lock = new object();
 
-        private readonly HashSet<ModeType> _activeModes = new HashSet<ModeType>();
-        private readonly Dictionary<ModeType, FrameworkElement> _statusBarIndicators = new Dictionary<ModeType, FrameworkElement>();
+        private ModeType? _activeMode;
+        private FrameworkElement _statusBarIndicator;
         private readonly Dictionary<ModeType, string> _modeSettingsFiles;
         private readonly string _baselineBackupPath;
-
-        private WritableSettingsStore _settingsStore;
 
         /// <summary>
         /// Gets the singleton instance.
@@ -71,12 +67,12 @@ namespace Modes
         /// <summary>
         /// Gets whether a specific mode is active.
         /// </summary>
-        public bool IsModeActive(ModeType mode) => _activeModes.Contains(mode);
+        public bool IsModeActive(ModeType mode) => _activeMode == mode;
 
         /// <summary>
-        /// Gets the currently active modes.
+        /// Gets the currently active mode, if any.
         /// </summary>
-        public IReadOnlyCollection<ModeType> ActiveModes => _activeModes;
+        public ModeType? ActiveMode => _activeMode;
 
         /// <summary>
         /// Initializes the manager and loads persisted mode states.
@@ -87,36 +83,18 @@ namespace Modes
 
             try
             {
-                SettingsManager settingsManager = new ShellSettingsManager(ServiceProvider.GlobalProvider);
-                _settingsStore = settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
-
-                if (!_settingsStore.CollectionExists(Constants.Storage.SettingsCollectionPath))
+                // Load persisted active mode from options
+                General options = await General.GetLiveInstanceAsync();
+                if (!string.IsNullOrEmpty(options.ActiveModeName) && Enum.TryParse(options.ActiveModeName, out ModeType mode))
                 {
-                    _settingsStore.CreateCollection(Constants.Storage.SettingsCollectionPath);
+                    _activeMode = mode;
                 }
 
-                // Load persisted active modes
-                if (_settingsStore.PropertyExists(Constants.Storage.SettingsCollectionPath, Constants.Storage.ActiveModesKey))
+                // Apply active mode and update UI
+                if (_activeMode.HasValue)
                 {
-                    string savedModes = _settingsStore.GetString(Constants.Storage.SettingsCollectionPath, Constants.Storage.ActiveModesKey);
-
-                    if (!string.IsNullOrEmpty(savedModes))
-                    {
-                        foreach (string modeStr in savedModes.Split(','))
-                        {
-                            if (Enum.TryParse(modeStr.Trim(), out ModeType mode))
-                            {
-                                _activeModes.Add(mode);
-                            }
-                        }
-                    }
-                }
-
-                // Apply active modes and update UI
-                if (_activeModes.Count > 0)
-                {
-                    await ApplyActiveModesAsync();
-                    await UpdateStatusBarIndicatorsAsync();
+                    await ApplyActiveModeAsync();
+                    await UpdateStatusBarIndicatorAsync();
                 }
             }
             catch (Exception ex)
@@ -134,32 +112,29 @@ namespace Modes
 
             try
             {
-                bool wasEmpty = _activeModes.Count == 0;
-                bool isCurrentlyActive = _activeModes.Contains(mode);
+                bool isCurrentlyActive = _activeMode == mode;
 
                 if (isCurrentlyActive)
                 {
                     // Disabling mode - restore baseline
                     await ShowStatusBarMessageAsync($"Disabling {mode} mode...");
-                    _activeModes.Clear();
+                    _activeMode = null;
                     await RestoreBaselineAsync();
                     await ShowStatusBarMessageAsync($"Disabled {mode} mode - restored baseline settings");
                 }
                 else
                 {
-                    // Enabling mode (mutually exclusive)
+                    // Enabling mode
                     await ShowStatusBarMessageAsync($"Enabling {mode} mode...");
 
-                    if (wasEmpty)
+                    if (!_activeMode.HasValue)
                     {
                         // Export current settings as baseline before applying first mode
                         await ExportBaselineAsync();
                     }
 
-                    // Clear any other active mode and set this one
-                    _activeModes.Clear();
-                    _activeModes.Add(mode);
-                    await ApplyActiveModesAsync();
+                    _activeMode = mode;
+                    await ApplyActiveModeAsync();
                     await ShowStatusBarMessageAsync($"Enabled {mode} mode");
 
                     // Execute mode-specific commands
@@ -167,8 +142,8 @@ namespace Modes
                 }
 
                 // Persist and update UI
-                await PersistActiveModesAsync();
-                await UpdateStatusBarIndicatorsAsync();
+                await PersistActiveModeAsync();
+                await UpdateStatusBarIndicatorAsync();
             }
             catch (Exception ex)
             {
@@ -178,7 +153,7 @@ namespace Modes
         }
 
         /// <summary>
-        /// Clears active modes without restoring baseline settings.
+        /// Clears active mode without restoring baseline settings.
         /// Used when restoring from a backup file.
         /// </summary>
         public async Task ClearActiveModeWithoutRestoreAsync()
@@ -187,9 +162,9 @@ namespace Modes
 
             try
             {
-                _activeModes.Clear();
-                await PersistActiveModesAsync();
-                await UpdateStatusBarIndicatorsAsync();
+                _activeMode = null;
+                await PersistActiveModeAsync();
+                await UpdateStatusBarIndicatorAsync();
             }
             catch (Exception ex)
             {
@@ -247,42 +222,19 @@ namespace Modes
         }
 
         /// <summary>
-        /// Applies all active modes by importing their settings files in order.
+        /// Applies the active mode by importing its settings file.
         /// </summary>
-        private async Task ApplyActiveModesAsync()
+        private async Task ApplyActiveModeAsync()
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            // Apply modes in a specific order: LowPower -> Focus -> Performance -> Presenter
-            ModeType[] orderedModes = { ModeType.LowPower, ModeType.Focus, ModeType.Performance, ModeType.Presenter };
-
-            foreach (ModeType mode in orderedModes)
+            if (_activeMode.HasValue && _modeSettingsFiles.TryGetValue(_activeMode.Value, out string settingsPath))
             {
-                if (_activeModes.Contains(mode) && _modeSettingsFiles.TryGetValue(mode, out string settingsPath))
+                if (File.Exists(settingsPath))
                 {
-                    if (File.Exists(settingsPath))
-                    {
-                        await ImportSettingsAsync(settingsPath);
-                    }
+                    await ImportSettingsAsync(settingsPath);
                 }
             }
-        }
-
-        /// <summary>
-        /// Reapplies all modes from baseline (used when disabling a mode).
-        /// </summary>
-        private async Task ReapplyAllModesAsync()
-        {
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-            // First restore baseline
-            if (File.Exists(_baselineBackupPath))
-            {
-                await ImportSettingsAsync(_baselineBackupPath);
-            }
-
-            // Then apply all active modes
-            await ApplyActiveModesAsync();
         }
 
         /// <summary>
@@ -343,19 +295,17 @@ namespace Modes
         }
 
         /// <summary>
-        /// Persists the active modes to user settings.
+        /// Persists the active mode to user settings.
         /// </summary>
-        private async Task PersistActiveModesAsync()
+        private async Task PersistActiveModeAsync()
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
             try
             {
-                if (_settingsStore != null)
-                {
-                    string modesString = string.Join(",", _activeModes);
-                    _settingsStore.SetString(Constants.Storage.SettingsCollectionPath, Constants.Storage.ActiveModesKey, modesString);
-                }
+                General options = await General.GetLiveInstanceAsync();
+                options.ActiveModeName = _activeMode?.ToString();
+                await options.SaveAsync();
             }
             catch (Exception ex)
             {
@@ -392,41 +342,26 @@ namespace Modes
         }
 
         /// <summary>
-        /// Updates status bar indicators based on active modes.
+        /// Updates status bar indicator based on active mode.
         /// </summary>
-        private async Task UpdateStatusBarIndicatorsAsync()
+        private async Task UpdateStatusBarIndicatorAsync()
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
             try
             {
-                // Remove indicators for inactive modes
-                var modesToRemove = new List<ModeType>();
-                foreach (KeyValuePair<ModeType, FrameworkElement> kvp in _statusBarIndicators)
+                // Remove existing indicator if present
+                if (_statusBarIndicator != null)
                 {
-                    if (!_activeModes.Contains(kvp.Key))
-                    {
-                        await StatusBarInjector.RemoveControlAsync(kvp.Value);
-                        modesToRemove.Add(kvp.Key);
-                    }
+                    await StatusBarInjector.RemoveControlAsync(_statusBarIndicator);
+                    _statusBarIndicator = null;
                 }
 
-                foreach (ModeType mode in modesToRemove)
+                // Add indicator if a mode is active
+                if (_activeMode.HasValue)
                 {
-                    _statusBarIndicators.Remove(mode);
-                }
-
-                // Add indicators for active modes that don't have them
-                foreach (ModeType mode in _activeModes)
-                {
-                    if (!_statusBarIndicators.ContainsKey(mode))
-                    {
-                        FrameworkElement indicator = CreateModeIndicator(mode);
-                        if (await StatusBarInjector.InjectControlAsync(indicator))
-                        {
-                            _statusBarIndicators[mode] = indicator;
-                        }
-                    }
+                    _statusBarIndicator = CreateModeIndicator(_activeMode.Value);
+                    await StatusBarInjector.InjectControlAsync(_statusBarIndicator);
                 }
             }
             catch (Exception ex)
@@ -463,11 +398,11 @@ namespace Modes
 
             var indicator = new CrispImage
             {
-                Moniker = KnownMonikers.BooleanData,
+                Moniker = KnownMonikers.FlagOutline,
                 Width = 16,
                 Height = 16,
                 ToolTip = $"{modeName} Mode is active. Click to disable.",
-                Margin = new Thickness(4, 0, 4, 0),
+                Margin = new Thickness(4, 0, 10, 0),
                 VerticalAlignment = VerticalAlignment.Center,
                 Cursor = System.Windows.Input.Cursors.Hand
             };
