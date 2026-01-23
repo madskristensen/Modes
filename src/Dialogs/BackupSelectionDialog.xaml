@@ -1,0 +1,142 @@
+<platform:DialogWindow x:Class="Modes.BackupSelectionDialog"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:platform="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+                      xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"
+                      xmlns:imaging="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.Imaging"
+                      xmlns:catalog="clr-namespace:Microsoft.VisualStudio.Imaging;assembly=Microsoft.VisualStudio.ImageCatalog"
+                      Title="Restore Settings Backup"
+                      Width="500"
+                      Height="400"
+                      MinWidth="400"
+                      MinHeight="300"
+                      WindowStartupLocation="CenterOwner"
+                      ShowInTaskbar="False"
+                      ResizeMode="CanResizeWithGrip"
+                      HasHelpButton="False"
+                      Background="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowBackgroundBrushKey}}">
+
+    <platform:DialogWindow.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
+        <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter" 
+                                         xmlns:local="clr-namespace:Modes"/>
+
+        <!-- Themed ListBox Style -->
+        <Style TargetType="ListBox">
+            <Setter Property="Background" Value="{DynamicResource {x:Static platform:ThemedDialogColors.ListBoxBrushKey}}"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static platform:ThemedDialogColors.ListBoxTextBrushKey}}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static platform:ThemedDialogColors.ListBoxBorderBrushKey}}"/>
+        </Style>
+
+        <!-- Themed TextBlock Style -->
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowTextBrushKey}}"/>
+        </Style>
+    </platform:DialogWindow.Resources>
+
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Grid.Row="0" 
+                   Text="Select a backup to restore:" 
+                   Margin="0,0,0,8"
+                   FontWeight="SemiBold"/>
+
+        <!-- Backup List -->
+        <ListBox Grid.Row="1" 
+                 x:Name="BackupListBox"
+                 SelectionMode="Single"
+                 SelectionChanged="BackupListBox_SelectionChanged"
+                 MouseDoubleClick="BackupListBox_MouseDoubleClick">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <imaging:CrispImage Grid.Column="0" 
+                                           Width="16" Height="16" 
+                                           Margin="0,0,8,0"
+                                           VerticalAlignment="Center"
+                                           Moniker="{x:Static catalog:KnownMonikers.Settings}"/>
+                        <TextBlock Grid.Column="1" 
+                                   Text="{Binding DisplayDate}" 
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" 
+                                   Text="{Binding FileSize}" 
+                                   VerticalAlignment="Center"
+                                   Opacity="0.7"
+                                   Margin="8,0,0,0"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <!-- Info Panel -->
+        <Border Grid.Row="2" 
+                Margin="0,8,0,0" 
+                Padding="8"
+                Background="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowBackgroundBrushKey}}"
+                BorderBrush="{DynamicResource {x:Static platform:EnvironmentColors.ToolWindowBorderBrushKey}}"
+                BorderThickness="1"
+                CornerRadius="2"
+                Visibility="{Binding SelectedItem, ElementName=BackupListBox, Converter={StaticResource NullToVisibilityConverter}}">
+            <StackPanel>
+                <TextBlock Text="Selected backup:" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                <TextBlock x:Name="SelectedBackupPathText" 
+                           TextWrapping="Wrap" 
+                           Opacity="0.8"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Buttons -->
+        <Grid Grid.Row="3" Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" 
+                    x:Name="CreateBackupButton"
+                    Content="Create Backup" 
+                    Style="{DynamicResource {x:Static shell:VsResourceKeys.ThemedDialogButtonStyleKey}}"
+                    Padding="12,6"
+                    Margin="0,0,8,0"
+                    Click="CreateBackupButton_Click"/>
+
+            <Button Grid.Column="1" 
+                    x:Name="BrowseFolderButton"
+                    Content="Open Backup Folder" 
+                    Style="{DynamicResource {x:Static shell:VsResourceKeys.ThemedDialogButtonStyleKey}}"
+                    Padding="12,6"
+                    Click="BrowseFolderButton_Click"/>
+
+            <Button Grid.Column="3" 
+                    x:Name="RestoreButton"
+                    Content="Restore" 
+                    Style="{DynamicResource {x:Static shell:VsResourceKeys.ThemedDialogButtonStyleKey}}"
+                    IsDefault="True"
+                    IsEnabled="False"
+                    Padding="12,6"
+                    Margin="0,0,8,0"
+                    Click="RestoreButton_Click"/>
+
+            <Button Grid.Column="4" 
+                    Content="Cancel" 
+                    Style="{DynamicResource {x:Static shell:VsResourceKeys.ThemedDialogButtonStyleKey}}"
+                    IsCancel="True"
+                    Padding="12,6"/>
+        </Grid>
+    </Grid>
+</platform:DialogWindow>

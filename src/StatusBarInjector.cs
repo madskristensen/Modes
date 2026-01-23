@@ -104,7 +104,7 @@ namespace Modes
             {
                 DependencyObject child = VisualTreeHelper.GetChild(parent, i);
 
-                T typedChild = child as T;
+                var typedChild = child as T;
                 if (typedChild == null)
                 {
                     foundChild = FindChild<T>(child, childName);

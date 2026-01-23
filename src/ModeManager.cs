@@ -4,13 +4,9 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
 using Community.VisualStudio.Toolkit;
 using EnvDTE80;
 using Microsoft.VisualStudio.Imaging;
-using Microsoft.VisualStudio.Imaging.Interop;
-using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -24,9 +20,6 @@ namespace Modes
     /// </summary>
     internal sealed class ModeManager
     {
-        private const string CollectionPath = "Modes";
-        private const string ActiveModesKey = "ActiveModes";
-
         private static ModeManager _instance;
         private static readonly object _lock = new object();
 
@@ -72,7 +65,7 @@ namespace Modes
             };
 
             string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            _baselineBackupPath = Path.Combine(appDataPath, "Modes", "baseline.vssettings");
+            _baselineBackupPath = Path.Combine(appDataPath, Constants.Storage.AppDataFolderName, Constants.Storage.BaselineFileName);
         }
 
         /// <summary>
@@ -97,15 +90,15 @@ namespace Modes
                 SettingsManager settingsManager = new ShellSettingsManager(ServiceProvider.GlobalProvider);
                 _settingsStore = settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
 
-                if (!_settingsStore.CollectionExists(CollectionPath))
+                if (!_settingsStore.CollectionExists(Constants.Storage.SettingsCollectionPath))
                 {
-                    _settingsStore.CreateCollection(CollectionPath);
+                    _settingsStore.CreateCollection(Constants.Storage.SettingsCollectionPath);
                 }
 
                 // Load persisted active modes
-                if (_settingsStore.PropertyExists(CollectionPath, ActiveModesKey))
+                if (_settingsStore.PropertyExists(Constants.Storage.SettingsCollectionPath, Constants.Storage.ActiveModesKey))
                 {
-                    string savedModes = _settingsStore.GetString(CollectionPath, ActiveModesKey);
+                    string savedModes = _settingsStore.GetString(Constants.Storage.SettingsCollectionPath, Constants.Storage.ActiveModesKey);
 
                     if (!string.IsNullOrEmpty(savedModes))
                     {
@@ -181,6 +174,26 @@ namespace Modes
             {
                 await ex.LogAsync();
                 await VS.MessageBox.ShowErrorAsync("Modes", $"Error toggling {mode} mode: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Clears active modes without restoring baseline settings.
+        /// Used when restoring from a backup file.
+        /// </summary>
+        public async Task ClearActiveModeWithoutRestoreAsync()
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            try
+            {
+                _activeModes.Clear();
+                await PersistActiveModesAsync();
+                await UpdateStatusBarIndicatorsAsync();
+            }
+            catch (Exception ex)
+            {
+                await ex.LogAsync();
             }
         }
 
@@ -341,7 +354,7 @@ namespace Modes
                 if (_settingsStore != null)
                 {
                     string modesString = string.Join(",", _activeModes);
-                    _settingsStore.SetString(CollectionPath, ActiveModesKey, modesString);
+                    _settingsStore.SetString(Constants.Storage.SettingsCollectionPath, Constants.Storage.ActiveModesKey, modesString);
                 }
             }
             catch (Exception ex)
@@ -388,7 +401,7 @@ namespace Modes
             try
             {
                 // Remove indicators for inactive modes
-                List<ModeType> modesToRemove = new List<ModeType>();
+                var modesToRemove = new List<ModeType>();
                 foreach (KeyValuePair<ModeType, FrameworkElement> kvp in _statusBarIndicators)
                 {
                     if (!_activeModes.Contains(kvp.Key))
@@ -427,48 +440,42 @@ namespace Modes
         /// </summary>
         private FrameworkElement CreateModeIndicator(ModeType mode)
         {
-            ImageMoniker moniker;
-            string tooltip;
+            string modeName;
 
             switch (mode)
             {
                 case ModeType.LowPower:
-                    moniker = KnownMonikers.Battery;
-                    tooltip = "Low Power Mode";
+                    modeName = "Low Power";
                     break;
                 case ModeType.Focus:
-                    moniker = KnownMonikers.ZoomIn;
-                    tooltip = "Focus Mode";
+                    modeName = "Focus";
                     break;
                 case ModeType.Performance:
-                    moniker = KnownMonikers.Performance;
-                    tooltip = "Performance Mode";
+                    modeName = "Performance";
                     break;
                 case ModeType.Presenter:
-                    moniker = KnownMonikers.FitToScreen;
-                    tooltip = "Presenter Mode";
+                    modeName = "Presenter";
                     break;
                 default:
-                    moniker = KnownMonikers.Settings;
-                    tooltip = mode.ToString();
+                    modeName = mode.ToString();
                     break;
             }
 
-            CrispImage indicator = new CrispImage
+            var indicator = new CrispImage
             {
-                Moniker = moniker,
-                Width = 14,
-                Height = 14,
-                ToolTip = tooltip,
+                Moniker = KnownMonikers.BooleanData,
+                Width = 16,
+                Height = 16,
+                ToolTip = $"{modeName} Mode is active. Click to disable.",
                 Margin = new Thickness(4, 0, 4, 0),
                 VerticalAlignment = VerticalAlignment.Center,
                 Cursor = System.Windows.Input.Cursors.Hand
             };
 
             // Make it clickable to toggle the mode
-            indicator.MouseLeftButtonUp += async (s, e) =>
+            indicator.MouseLeftButtonUp += (s, e) =>
             {
-                await ToggleModeAsync(mode);
+                ToggleModeAsync(mode).FireAndForget();
             };
 
             return indicator;

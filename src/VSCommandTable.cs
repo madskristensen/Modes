@@ -25,9 +25,12 @@ namespace Modes
         public const int ModesMenuGroup = 0x0001;
         public const int ModesSubMenu = 0x0002;
         public const int ModeCommandsGroup = 0x0003;
+        public const int ResetCommandsGroup = 0x0004;
         public const int LowPowerCommand = 0x0100;
         public const int FocusCommand = 0x0101;
         public const int PerformanceCommand = 0x0102;
         public const int PresenterCommand = 0x0103;
+        public const int ResetSettingsCommand = 0x0104;
+        public const int SettingsCommand = 0x0105;
     }
 }

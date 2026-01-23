@@ -20,11 +20,15 @@
 
     <Groups>
       <!-- Group that places the Modes submenu near bottom of Tools menu, above Theme (IDG_VS_TOOLS_OPTIONS = 0x0500) -->
-      <Group guid="Modes" id="ModesMenuGroup" priority="0x0450">
+      <Group guid="Modes" id="ModesMenuGroup" priority="0x0050">
         <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS"/>
       </Group>
       <!-- Group containing the mode toggle commands inside the Modes submenu -->
       <Group guid="Modes" id="ModeCommandsGroup" priority="0x0100">
+        <Parent guid="Modes" id="ModesSubMenu"/>
+      </Group>
+      <!-- Separator group for Reset command -->
+      <Group guid="Modes" id="ResetCommandsGroup" priority="0x0200">
         <Parent guid="Modes" id="ModesSubMenu"/>
       </Group>
     </Groups>
@@ -33,10 +37,8 @@
       <!-- Low Power Mode -->
       <Button guid="Modes" id="LowPowerCommand" priority="0x0100" type="Button">
         <Parent guid="Modes" id="ModeCommandsGroup" />
-        <Icon guid="ImageCatalogGuid" id="Battery" />
-        <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>Low Power</ButtonText>
+          <ButtonText>Low power mode</ButtonText>
           <LocCanonicalName>.Modes.LowPower</LocCanonicalName>
         </Strings>
       </Button>
@@ -44,10 +46,8 @@
       <!-- Focus Mode -->
       <Button guid="Modes" id="FocusCommand" priority="0x0200" type="Button">
         <Parent guid="Modes" id="ModeCommandsGroup" />
-        <Icon guid="ImageCatalogGuid" id="ZoomIn" />
-        <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>Focus</ButtonText>
+          <ButtonText>Focus mode</ButtonText>
           <LocCanonicalName>.Modes.Focus</LocCanonicalName>
         </Strings>
       </Button>
@@ -55,10 +55,8 @@
       <!-- Performance Mode -->
       <Button guid="Modes" id="PerformanceCommand" priority="0x0300" type="Button">
         <Parent guid="Modes" id="ModeCommandsGroup" />
-        <Icon guid="ImageCatalogGuid" id="Performance" />
-        <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>Performance</ButtonText>
+          <ButtonText>Performance mode</ButtonText>
           <LocCanonicalName>.Modes.Performance</LocCanonicalName>
         </Strings>
       </Button>
@@ -66,11 +64,31 @@
       <!-- Presenter Mode -->
       <Button guid="Modes" id="PresenterCommand" priority="0x0400" type="Button">
         <Parent guid="Modes" id="ModeCommandsGroup" />
-        <Icon guid="ImageCatalogGuid" id="FitToScreen" />
+        <Strings>
+          <ButtonText>Presenter mode</ButtonText>
+          <LocCanonicalName>.Modes.Presenter</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <!-- Reset Settings -->
+      <Button guid="Modes" id="ResetSettingsCommand" priority="0x0100" type="Button">
+        <Parent guid="Modes" id="ResetCommandsGroup" />
+        <Icon guid="ImageCatalogGuid" id="History" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>Presenter</ButtonText>
-          <LocCanonicalName>.Modes.Presenter</LocCanonicalName>
+          <ButtonText>Restore Settings...</ButtonText>
+          <LocCanonicalName>.Modes.RestoreSettings</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <!-- Settings -->
+      <Button guid="Modes" id="SettingsCommand" priority="0x0200" type="Button">
+        <Parent guid="Modes" id="ResetCommandsGroup" />
+        <Icon guid="ImageCatalogGuid" id="Settings" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Settings...</ButtonText>
+          <LocCanonicalName>.Modes.Settings</LocCanonicalName>
         </Strings>
       </Button>
     </Buttons>
@@ -81,10 +99,13 @@
       <IDSymbol name="ModesMenuGroup" value="0x0001" />
       <IDSymbol name="ModesSubMenu" value="0x0002" />
       <IDSymbol name="ModeCommandsGroup" value="0x0003" />
+      <IDSymbol name="ResetCommandsGroup" value="0x0004" />
       <IDSymbol name="LowPowerCommand" value="0x0100" />
       <IDSymbol name="FocusCommand" value="0x0101" />
       <IDSymbol name="PerformanceCommand" value="0x0102" />
       <IDSymbol name="PresenterCommand" value="0x0103" />
+      <IDSymbol name="ResetSettingsCommand" value="0x0104" />
+      <IDSymbol name="SettingsCommand" value="0x0105" />
     </GuidSymbol>
   </Symbols>
 </CommandTable>
