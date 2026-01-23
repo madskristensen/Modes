@@ -147,6 +147,7 @@ namespace Modes
                 if (isCurrentlyActive)
                 {
                     // Disabling mode - restore baseline
+                    await ShowStatusBarMessageAsync($"Disabling {mode} mode...");
                     _activeModes.Clear();
                     await RestoreBaselineAsync();
                     await ShowStatusBarMessageAsync($"Disabled {mode} mode - restored baseline settings");
@@ -154,6 +155,8 @@ namespace Modes
                 else
                 {
                     // Enabling mode (mutually exclusive)
+                    await ShowStatusBarMessageAsync($"Enabling {mode} mode...");
+
                     if (wasEmpty)
                     {
                         // Export current settings as baseline before applying first mode
