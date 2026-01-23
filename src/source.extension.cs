@@ -10,11 +10,11 @@ namespace Modes
     {
         public const string Id = "Modes.428ec7ea-b605-49cd-a32e-415bfa035ff2";
         public const string Name = "Modes";
-        public const string Description = @"Empty VSIX Project.";
+        public const string Description = @"One-click access to optimized Visual Studio configurations. Switch between Low Power, Focus, Performance, and Presenter modes instantly—your settings are automatically backed up and restored.";
         public const string Language = "en-US";
         public const string Version = "1.0";
         public const string Author = "Mads Kristensen";
-        public const string Tags = "zen, focus, perf";
+        public const string Tags = "zen, focus, performance, battery, power, presenter, modes, settings";
         public const bool IsPreview = false;
     }
 }

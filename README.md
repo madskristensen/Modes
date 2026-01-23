@@ -4,138 +4,133 @@
 [![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/MadsKristensen.Modes?label=VS%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=MadsKristensen.Modes)
 [![Visual Studio Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/MadsKristensen.Modes)](https://marketplace.visualstudio.com/items?itemName=MadsKristensen.Modes)
 
-A Visual Studio extension that provides toggleable modes to quickly switch between different IDE configurations. Each mode applies a curated set of settings optimized for specific scenarios.
+**Stop wrestling with Visual Studio settings.** This extension gives you one-click access to optimized configurations for common scenarios - whether you're presenting code, working on battery, need maximum performance, or want distraction-free focus time.
 
 ![Menu](art/menu.png)
 
+## The Problem
+
+Visual Studio has hundreds of settings that affect performance, battery life, and the coding experience. Finding and tweaking them for different situations is tedious:
+
+- **On battery?** You need to disable CodeLens, background analysis, animations, and more to extend battery life
+- **Presenting or screen sharing?** Fonts are too small and the audience can't read your code
+- **VS feeling slow?** Figuring out which features to disable requires deep knowledge of the IDE
+- **Need to focus?** Tool windows and UI elements constantly compete for attention
+
+Manually toggling these settings every time your context changes is frustrating - and remembering to restore them afterward is even worse.
+
+## The Solution
+
+**Modes** provides four carefully curated configurations that instantly transform Visual Studio for specific scenarios. Enable a mode with one click, and your original settings are automatically backed up. Disable it, and everything is restored exactly as it was.
+
+## Modes
+
+- **🔋 Low Power** - Maximize battery life on laptops
+- **🔍 Focus** - Distraction-free coding environment  
+- **🚀 Performance** - Eliminate UI lag and typing delays
+- **🎤 Presenter** - Large fonts for demos and screen sharing
+
 ## Features
 
-- **Four distinct modes** for different workflows
-- **Toggle via menu** at Tools > Modes
-- **Status bar indicator** shows active mode (click to toggle off)
-- **Baseline backup** automatically saves your settings before first mode activation
-- **Session persistence** remembers active mode across VS restarts
-- **Auto Low Power mode** automatically enables when Windows enters battery saver mode
-- **Auto-backup settings** periodically backs up your VS settings when idle
-- **Restore Settings dialog** to restore from automatic backups or create new ones
+- **One-click toggle** from Tools > Modes menu
+- **Status bar indicator** - see active mode at a glance, click to disable
+- **Automatic baseline backup** - your settings are always safe
+- **Auto Low Power mode** - activates when Windows enters battery saver
+- **Settings backup service** - periodic backups of your VS settings
 
 ## Usage
 
-1. Open the **Tools** menu
-2. Navigate to **Modes** submenu
-3. Click a mode to toggle it on/off
-4. Active mode shows a checkmark and displays a flag indicator in the status bar
-5. Click the status bar indicator to quickly toggle the mode off
+1. Open **Tools > Modes**
+2. Click a mode to enable it
+3. Click again (or the status bar icon) to disable and restore your settings
 
 ![Statusbar](art/statusbar.png)
 
 ## Options
 
-Access options via **Tools > Options > Modes > General**:
+Configure behavior via **Tools > Options > Modes > General**:
 
 ![Settings](art/settings.png)
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| Auto-backup settings | true | Automatically back up Visual Studio settings when the computer is idle. |
-| Auto-enable Low Power mode | true | Automatically enable Low Power mode when Windows enters power saver/battery saver mode. |
-| Backup interval (hours) | 48 | Minimum time between automatic backups in hours. |
+| Auto-backup settings | true | Automatically back up Visual Studio settings when idle |
+| Auto-enable Low Power mode | true | Enable Low Power mode when Windows enters battery saver |
+| Backup interval (hours) | 48 | Minimum time between automatic backups |
 
 ## Restore Settings
 
-Use **Tools > Modes > Restore Settings...** to restore from a previous backup or create a new backup on demand.
+Accidentally changed something? Use **Tools > Modes > Restore Settings...** to restore from any previous backup or create a new backup on demand.
 
 ![Restore settings](art/restore.png)
 
-## Modes
+## Mode Details
 
 ### 🔋 Low Power Mode
 
-Optimizes for battery life and large solutions by disabling background work, visual effects, and performance-heavy features.
+*Perfect for: Working on battery, large solutions, limited hardware*
 
-<!-- TODO: Add screenshot of Low Power mode active -->
+Dramatically reduces CPU, GPU, and disk usage by disabling background work and visual effects. Automatically activates when Windows enters battery saver mode.
 
-| Setting | Value | Description |
-|---------|-------|-------------|
-| Animate Environment Tools | false | Disables UI animations |
-| Auto Adjust Experience | false | Prevents auto visual adjustments |
-| Background Analysis Scope Option | Open documents | Limits background analysis to open documents only |
-| C# Closed File Diagnostics | Disabled | No background analysis of closed files |
-| Code Lens | false | Disables CodeLens |
-| Concurrent Builds | 1 | Single-threaded builds to save CPU |
-| Detect File Changes Outside IDE | false | Reduces disk I/O |
-| Enable Diagnostic Tools | false | Disables diagnostic tools while debugging |
-| Enable Just My Code | true | Skips stepping through framework/external code |
-| Inline Parameter Name Hints | false | Reduces typing delay |
-| Inline Type Hints | false | Reduces typing delay |
-| Is Background Download Enabled | false | Disables background update downloads |
-| Reopen Documents On Solution Load | false | Faster startup |
-| Restore Solution Explorer Project Hierarchy State | false | Faster solution load |
-| Show Annotations | false | Disables scrollbar annotations |
-| Track File Selection In Explorer | false | Disables track active item in Solution Explorer |
-| Use Hardware Graphics Acceleration | false | Reduces GPU usage |
-| Use Map Mode | false | Uses bar mode instead of map mode for scrollbar |
-| Word Wrap | false | Disables word wrap |
+| Setting | Value | Why |
+|---------|-------|-----|
+| Background Analysis Scope | Open documents | Stop analyzing files you're not editing |
+| C# Closed File Diagnostics | Disabled | No CPU spent on closed files |
+| CodeLens | Disabled | Removes constant background queries |
+| Concurrent Builds | 1 | Reduces CPU/thermal load |
+| Hardware Acceleration | Disabled | Reduces GPU power draw |
+| Animations | Disabled | Eliminates unnecessary rendering |
+| Auto-downloads | Disabled | No background network activity |
 
 ### 🔍 Focus Mode
 
-Minimizes distractions for deep-work coding sessions by hiding UI clutter and auto-hiding tool windows.
+*Perfect for: Deep work, flow state, distraction-free coding*
 
-| Setting | Value | Description |
-|---------|-------|-------------|
-| Animate Environment Tools | false | Disables UI animations |
-| Auto Adjust Experience | false | Consistent visual experience |
-| Code Lens | false | Disables CodeLens |
-| Fading (all) | false | Disables code fading effects |
-| Inline Parameter Name Hints | false | Hides inline parameter hints |
-| Inline Type Hints | false | Hides inline type hints |
-| Show Annotations | false | Hides scrollbar annotations |
-| Show Navigation Bar | false | Hides navigation bar |
-| Show Warning Messages | false | Reduces interruptions |
-| Use Map Mode | false | Uses bar mode instead of map mode for scrollbar |
-| Window.AutoHideAll | Executed | Auto-hides all tool windows |
+Creates a minimal, distraction-free environment by hiding UI clutter and reducing visual noise.
 
-### 🚀 Performance Mode
+| Setting | Value | Why |
+|---------|-------|-----|
+| Tool Windows | Auto-hidden | Maximum code visibility |
+| CodeLens | Disabled | Cleaner editor |
+| Navigation Bar | Hidden | More vertical space |
+| Inline Hints | Disabled | Less visual noise |
+| Code Fading | Disabled | No distracting dimming effects |
 
-Disables features that slow down Visual Studio, cause UI hangs, typing delays, or slow solution load times.
+### 🚀 Performance Mode  
 
-| Setting | Value | Description |
-|---------|-------|-------------|
-| Animate Environment Tools | false | Reduces UI overhead |
-| C# Closed File Diagnostics | Disabled | No background analysis of closed files |
-| Concurrent Builds | 22 | Maximum parallel builds |
-| Inline Parameter Name Hints | false | Reduces typing delay |
-| Inline Type Hints | false | Reduces typing delay |
-| Reopen Documents On Solution Load | false | Faster solution load |
-| Restore Solution Explorer Project Hierarchy State | false | Faster solution load |
-| Show Annotations | false | Reduces scrollbar rendering |
-| Show Output Window Before Build | false | Avoids UI thread work |
-| Skip Analyzers For Implicitly Triggered Builds | true | Faster implicit builds |
-| Suggest For Types In NuGet Packages | false | Reduces network/CPU overhead |
-| Track File Selection In Explorer | false | Reduces UI thread work |
-| Use Map Mode | false | Uses bar mode instead of map mode for scrollbar |
+*Perfect for: Large solutions, slow machines, eliminating typing lag*
+
+Disables features known to cause UI hangs, typing delays, and slow solution loads.
+
+| Setting | Value | Why |
+|---------|-------|-----|
+| Concurrent Builds | 22 | Maximum parallel compilation |
+| Skip Analyzers (implicit builds) | true | Faster hot reload and background builds |
+| Track Active Item | Disabled | Reduces UI thread work |
+| Output Window on Build | Disabled | No UI thread blocking |
+| Document Restore | Disabled | Faster solution open |
 
 ### 🎤 Presenter Mode
 
-Increases font sizes for better visibility during presentations, demos, and screen sharing.
+*Perfect for: Presentations, demos, pair programming, screen sharing*
 
-| Setting | Value | Description |
-|---------|-------|-------------|
-| Editor Tooltip Font | Cascadia Code 14pt | Larger tooltips |
-| Environment Font | Segoe UI 11pt | Larger UI elements |
-| Find Results Font | Cascadia Code 14pt | Larger search results |
-| Output Window Font | Cascadia Code 14pt | Larger output text |
-| Statement Completion Font | Cascadia Code 14pt | Larger IntelliSense popup |
-| Terminal Font | Cascadia Code 14pt | Larger terminal text |
-| Text Editor Font | Cascadia Code 16pt | Larger code font |
+Increases all font sizes so your audience can actually read your code.
+
+| Setting | Value |
+|---------|-------|
+| Text Editor Font | Cascadia Code 16pt |
+| Environment Font | Segoe UI 11pt |
+| Terminal Font | Cascadia Code 14pt |
+| Output/Find Results | Cascadia Code 14pt |
+| IntelliSense/Tooltips | Cascadia Code 14pt |
 
 ## How It Works
 
-- When you enable a mode, your current settings are exported as a baseline backup
-- The mode's `.vssettings` file is imported to apply the configuration
-- Modes are mutually exclusive - enabling one automatically disables any other active mode
-- Disabling a mode restores your baseline settings
-- The active mode persists across Visual Studio restarts
+1. **Enable a mode** → Your current settings are exported as a baseline backup
+2. **Mode settings applied** → The mode's optimized `.vssettings` file is imported
+3. **Disable the mode** → Your baseline settings are restored exactly as they were
+
+Modes are mutually exclusive—enabling one automatically disables any other active mode. Your active mode persists across Visual Studio restarts.
 
 ## Contributing
 
