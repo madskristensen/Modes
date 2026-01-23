@@ -52,11 +52,11 @@ Configure behavior via **Tools > Options > Modes > General**:
 
 ![Settings](art/settings.png)
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| Auto-backup settings | true | Automatically back up Visual Studio settings when idle |
-| Auto-enable Low Power mode | true | Enable Low Power mode when Windows enters battery saver |
-| Backup interval (hours) | 48 | Minimum time between automatic backups |
+| Option                     | Default | Description                                             |
+| -------------------------- | ------- | ------------------------------------------------------- |
+| Auto-backup settings       | true    | Automatically back up Visual Studio settings when idle  |
+| Auto-enable Low Power mode | true    | Enable Low Power mode when Windows enters battery saver |
+| Backup interval (hours)    | 48      | Minimum time between automatic backups                  |
 
 ## Restore Settings
 
@@ -72,15 +72,19 @@ Accidentally changed something? Use **Tools > Modes > Restore Settings...** to r
 
 Dramatically reduces CPU, GPU, and disk usage by disabling background work and visual effects. Automatically activates when Windows enters battery saver mode.
 
-| Setting | Value | Why |
-|---------|-------|-----|
-| Background Analysis Scope | Open documents | Stop analyzing files you're not editing |
-| C# Closed File Diagnostics | Disabled | No CPU spent on closed files |
-| CodeLens | Disabled | Removes constant background queries |
-| Concurrent Builds | 1 | Reduces CPU/thermal load |
-| Hardware Acceleration | Disabled | Reduces GPU power draw |
-| Animations | Disabled | Eliminates unnecessary rendering |
-| Auto-downloads | Disabled | No background network activity |
+| Setting                     | Value          | Why                                     |
+| --------------------------- | -------------- | --------------------------------------- |
+| Animations                  | Disabled       | Eliminates unnecessary rendering        |
+| Auto-downloads              | Disabled       | No background network activity          |
+| Background Analysis Scope   | Open documents | Stop analyzing files you're not editing |
+| C# Closed File Diagnostics  | Disabled       | No CPU spent on closed files            |
+| CodeLens                    | Disabled       | Removes constant background queries     |
+| Concurrent Builds           | 1              | Reduces CPU/thermal load                |
+| Extension Auto-Update Check | Disabled       | No background network/CPU usage         |
+| File Change Detection       | Disabled       | Reduces disk I/O polling                |
+| Hardware Acceleration       | Disabled       | Reduces GPU power draw                  |
+| Highlight References        | Disabled       | Reduces typing delay                    |
+| Inline Hints                | Disabled       | Reduces rendering overhead              |
 
 ### 🔍 Focus Mode
 
@@ -88,13 +92,16 @@ Dramatically reduces CPU, GPU, and disk usage by disabling background work and v
 
 Creates a minimal, distraction-free environment by hiding UI clutter and reducing visual noise.
 
-| Setting | Value | Why |
-|---------|-------|-----|
-| Tool Windows | Auto-hidden | Maximum code visibility |
-| CodeLens | Disabled | Cleaner editor |
-| Navigation Bar | Hidden | More vertical space |
-| Inline Hints | Disabled | Less visual noise |
-| Code Fading | Disabled | No distracting dimming effects |
+| Setting                | Value       | Why                            |
+| ---------------------- | ----------- | ------------------------------ |
+| Tool Windows           | Auto-hidden | Maximum code visibility        |
+| CodeLens               | Disabled    | Cleaner editor                 |
+| Inline Hints           | Disabled    | Less visual noise              |
+| Code Fading            | Disabled    | No distracting dimming effects |
+| Current Line Highlight | Disabled    | Cleaner editor appearance      |
+| Navigation Bar         | Hidden      | More vertical space            |
+| Selection Matches      | Disabled    | No distracting highlights      |
+| Warning Messages       | Disabled    | Fewer interruptions            |
 
 ### 🚀 Performance Mode  
 
@@ -102,13 +109,13 @@ Creates a minimal, distraction-free environment by hiding UI clutter and reducin
 
 Disables features known to cause UI hangs, typing delays, and slow solution loads.
 
-| Setting | Value | Why |
-|---------|-------|-----|
-| Concurrent Builds | 22 | Maximum parallel compilation |
-| Skip Analyzers (implicit builds) | true | Faster hot reload and background builds |
-| Track Active Item | Disabled | Reduces UI thread work |
-| Output Window on Build | Disabled | No UI thread blocking |
-| Document Restore | Disabled | Faster solution open |
+| Setting                          | Value    | Why                                     |
+| -------------------------------- | -------- | --------------------------------------- |
+| Concurrent Builds                | 22       | Maximum parallel compilation            |
+| Document Restore                 | Disabled | Faster solution open                    |
+| Output Window on Build           | Disabled | No UI thread blocking                   |
+| Skip Analyzers (implicit builds) | true     | Faster hot reload and background builds |
+| Track Active Item                | Disabled | Reduces UI thread work                  |
 
 ### 🎤 Presenter Mode
 
@@ -116,13 +123,16 @@ Disables features known to cause UI hangs, typing delays, and slow solution load
 
 Increases all font sizes so your audience can actually read your code.
 
-| Setting | Value |
-|---------|-------|
-| Text Editor Font | Cascadia Code 16pt |
-| Environment Font | Segoe UI 11pt |
-| Terminal Font | Cascadia Code 14pt |
-| Output/Find Results | Cascadia Code 14pt |
-| IntelliSense/Tooltips | Cascadia Code 14pt |
+| Setting                 | Value              |
+| ----------------------- | ------------------ |
+| Command Window          | Cascadia Code 14pt |
+| Environment Font        | Segoe UI 11pt      |
+| Immediate Window        | Cascadia Code 14pt |
+| IntelliSense/Completion | Cascadia Code 14pt |
+| Output Window           | Cascadia Code 14pt |
+| Printer Font            | Cascadia Code 16pt |
+| Text Editor Font        | Cascadia Code 16pt |
+| Watch/Locals Windows    | Cascadia Code 14pt |
 
 ## How It Works
 

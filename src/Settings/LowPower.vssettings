@@ -109,4 +109,8 @@
 			</ToolsOptionsSubCategory>
 		</ToolsOptionsCategory>
 	</ToolsOptions>
+	<!-- Disable automatic extension update checks to save background CPU/network -->
+	<Category name="Environment_ExtensionManager" Category="{539391d7-9414-4715-b033-8669db0abee1}" Package="{5dd582d8-4665-49e4-b74d-d376fb4ce60b}" RegisteredName="Environment_ExtensionManager" PackageName="ExtensionManagementPackage">
+		<PropertyValue name="AutomaticallyCheckForUpdates2">False</PropertyValue>
+	</Category>
 </UserSettings>

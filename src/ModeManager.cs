@@ -129,12 +129,15 @@ namespace Modes
                     // Enabling mode
                     await ShowStatusBarMessageAsync($"Enabling {mode} mode...");
 
-                    if (!_activeMode.HasValue)
+                    if (_activeMode.HasValue)
                     {
-                        // Export current settings as baseline before applying first mode
-                        // Only export the settings that will be modified by this mode
-                        await ExportBaselineAsync(mode);
+                        // Switching from one mode to another - restore baseline first
+                        await RestoreBaselineAsync();
                     }
+
+                    // Export current (now clean) settings as baseline before applying new mode
+                    // Only export the settings that will be modified by this mode
+                    await ExportBaselineAsync(mode);
 
                     _activeMode = mode;
                     await ApplyActiveModeAsync();
@@ -193,28 +196,292 @@ namespace Modes
                 }
 
                 DTE2 dte = await VS.GetServiceAsync<EnvDTE.DTE, DTE2>();
-                if (dte != null)
+                if (dte == null)
                 {
-                    // Get the categories that the mode's settings file will modify
-                    string modeSettingsPath = _modeSettingsFiles[mode];
-                    List<string> categories = GetCategoriesFromSettingsFile(modeSettingsPath);
+                    return;
+                }
 
-                    if (categories.Count > 0)
-                    {
-                        // Export only the categories that will be modified by the mode
-                        string categoryFilter = string.Join(";", categories);
-                        dte.ExecuteCommand("Tools.ImportandExportSettings", $"/export:\"{_baselineBackupPath}\" /subset:\"{categoryFilter}\"");
-                    }
-                    else
-                    {
-                        // Fallback to full export if we couldn't parse categories
-                        dte.ExecuteCommand("Tools.ImportandExportSettings", $"/export:\"{_baselineBackupPath}\"");
-                    }
+                // Load the mode's settings file to use as a template for filtering
+                string modeSettingsPath = _modeSettingsFiles[mode];
+                if (!File.Exists(modeSettingsPath))
+                {
+                    // Fallback to full export
+                    dte.ExecuteCommand("Tools.ImportandExportSettings", $"/export:\"{_baselineBackupPath}\"");
+                    return;
+                }
+
+                var modeSettingsDoc = new XmlDocument();
+                modeSettingsDoc.Load(modeSettingsPath);
+
+                // Export full settings to a temp file, then filter it
+                string tempExportPath = Path.Combine(dir, "temp_full_export.vssettings");
+                dte.ExecuteCommand("Tools.ImportandExportSettings", $"/export:\"{tempExportPath}\"");
+
+                // Wait a moment for the file to be written
+                await Task.Delay(500);
+
+                // Filter the exported settings to match the mode's settings structure
+                if (File.Exists(tempExportPath))
+                {
+                    FilterSettingsFile(tempExportPath, _baselineBackupPath, modeSettingsDoc);
+                    File.Delete(tempExportPath);
                 }
             }
             catch (Exception ex)
             {
                 await ex.LogAsync();
+            }
+        }
+
+        /// <summary>
+        /// Filters a vssettings file to only keep the exact properties defined in the mode's settings.
+        /// </summary>
+        private void FilterSettingsFile(string sourcePath, string destPath, XmlDocument modeSettings)
+        {
+            try
+            {
+                var exportDoc = new XmlDocument();
+                exportDoc.Load(sourcePath);
+
+                XmlNode exportUserSettings = exportDoc.SelectSingleNode("/UserSettings");
+                XmlNode modeUserSettings = modeSettings.SelectSingleNode("/UserSettings");
+
+                if (exportUserSettings == null || modeUserSettings == null)
+                {
+                    File.Copy(sourcePath, destPath, true);
+                    return;
+                }
+
+                // Build lookup of properties to keep from mode settings
+                // Key: "ParentCategory/SubCategory/PropertyName", Value: true
+                var propertiesToKeep = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                // Extract property paths from mode's ToolsOptions
+                XmlNode modeToolsOptions = modeUserSettings.SelectSingleNode("ToolsOptions");
+                if (modeToolsOptions != null)
+                {
+                    foreach (XmlNode category in modeToolsOptions.SelectNodes("ToolsOptionsCategory"))
+                    {
+                        string categoryName = category.Attributes?["name"]?.Value;
+                        if (string.IsNullOrEmpty(categoryName)) continue;
+
+                        foreach (XmlNode subCategory in category.SelectNodes("ToolsOptionsSubCategory"))
+                        {
+                            string subCategoryName = subCategory.Attributes?["name"]?.Value;
+                            if (string.IsNullOrEmpty(subCategoryName)) continue;
+
+                            foreach (XmlNode prop in subCategory.SelectNodes("PropertyValue"))
+                            {
+                                string propName = prop.Attributes?["name"]?.Value;
+                                if (!string.IsNullOrEmpty(propName))
+                                {
+                                    propertiesToKeep.Add($"{categoryName}/{subCategoryName}/{propName}");
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Extract FontsAndColors category GUIDs to keep (handle both GUID and Guid attributes)
+                // The structure can be: UserSettings/Category[@name='Environment_Group']/Category[@name='Environment_FontsAndColors']
+                // or directly: UserSettings/Category[@name='Environment_FontsAndColors']
+                var fontCategoryGuidsToKeep = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                XmlNode modeFontsCategory = modeUserSettings.SelectSingleNode(".//Category[@name='Environment_FontsAndColors']");
+                if (modeFontsCategory != null)
+                {
+                    foreach (XmlNode fontCategory in modeFontsCategory.SelectNodes(".//Category[@GUID or @Guid]"))
+                    {
+                        // Try both GUID (uppercase) and Guid (mixed case) attributes
+                        string guid = fontCategory.Attributes?["GUID"]?.Value 
+                                   ?? fontCategory.Attributes?["Guid"]?.Value;
+                        if (!string.IsNullOrEmpty(guid))
+                        {
+                            fontCategoryGuidsToKeep.Add(guid);
+                        }
+                    }
+                }
+
+                // Extract top-level Category names to keep from mode settings
+                var topLevelCategoriesToKeep = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (XmlNode modeCategory in modeUserSettings.SelectNodes("Category"))
+                {
+                    string categoryName = modeCategory.Attributes?["name"]?.Value;
+                    if (!string.IsNullOrEmpty(categoryName))
+                    {
+                        topLevelCategoriesToKeep.Add(categoryName);
+                    }
+                }
+
+                // Filter ToolsOptions in the export to only keep matching properties
+                XmlNode exportToolsOptions = exportUserSettings.SelectSingleNode("ToolsOptions");
+                if (exportToolsOptions != null)
+                {
+                    if (propertiesToKeep.Count == 0)
+                    {
+                        // Mode has no ToolsOptions settings, clear all ToolsOptionsCategory children
+                        exportToolsOptions.RemoveAll();
+                    }
+                    else
+                    {
+                        var categoriesToRemove = new List<XmlNode>();
+
+                        foreach (XmlNode category in exportToolsOptions.SelectNodes("ToolsOptionsCategory"))
+                        {
+                            string categoryName = category.Attributes?["name"]?.Value;
+                            if (string.IsNullOrEmpty(categoryName)) continue;
+
+                            var subCategoriesToRemove = new List<XmlNode>();
+
+                            foreach (XmlNode subCategory in category.SelectNodes("ToolsOptionsSubCategory"))
+                            {
+                                string subCategoryName = subCategory.Attributes?["name"]?.Value;
+                                if (string.IsNullOrEmpty(subCategoryName)) continue;
+
+                                var propsToRemove = new List<XmlNode>();
+
+                                foreach (XmlNode prop in subCategory.SelectNodes("PropertyValue"))
+                                {
+                                    string propName = prop.Attributes?["name"]?.Value;
+                                    string fullPath = $"{categoryName}/{subCategoryName}/{propName}";
+
+                                    if (!propertiesToKeep.Contains(fullPath))
+                                    {
+                                        propsToRemove.Add(prop);
+                                    }
+                                }
+
+                                foreach (XmlNode node in propsToRemove)
+                                {
+                                    subCategory.RemoveChild(node);
+                                }
+
+                                // Remove subcategory if no properties left
+                                if (subCategory.SelectNodes("PropertyValue").Count == 0)
+                                {
+                                    subCategoriesToRemove.Add(subCategory);
+                                }
+                            }
+
+                            foreach (XmlNode node in subCategoriesToRemove)
+                            {
+                                category.RemoveChild(node);
+                            }
+
+                            // Remove category if no subcategories left
+                            if (category.SelectNodes("ToolsOptionsSubCategory").Count == 0)
+                            {
+                                categoriesToRemove.Add(category);
+                            }
+                        }
+
+                        foreach (XmlNode node in categoriesToRemove)
+                        {
+                            exportToolsOptions.RemoveChild(node);
+                        }
+                    }
+                }
+
+                // Filter top-level Categories - keep ones defined in mode settings
+                var topLevelToRemove = new List<XmlNode>();
+                foreach (XmlNode category in exportUserSettings.SelectNodes("Category"))
+                {
+                    string categoryName = category.Attributes?["name"]?.Value;
+
+                    if (categoryName == "Environment_Group" && fontCategoryGuidsToKeep.Count > 0)
+                    {
+                        // Find Environment_FontsAndColors inside Environment_Group
+                        XmlNode fontsColorCategory = category.SelectSingleNode("Category[@name='Environment_FontsAndColors']");
+                        if (fontsColorCategory != null)
+                        {
+                            // Filter the FontsAndColors to only keep matching GUIDs
+                            XmlNode fontsAndColors = fontsColorCategory.SelectSingleNode("FontsAndColors");
+                            if (fontsAndColors != null)
+                            {
+                                var fontCategoriesToRemove = new List<XmlNode>();
+                                // Categories are inside Categories/Category elements
+                                foreach (XmlNode fontCategory in fontsAndColors.SelectNodes(".//Category[@GUID or @Guid]"))
+                                {
+                                    string guid = fontCategory.Attributes?["GUID"]?.Value 
+                                               ?? fontCategory.Attributes?["Guid"]?.Value;
+                                    if (!string.IsNullOrEmpty(guid) && !fontCategoryGuidsToKeep.Contains(guid))
+                                    {
+                                        fontCategoriesToRemove.Add(fontCategory);
+                                    }
+                                }
+
+                                foreach (XmlNode node in fontCategoriesToRemove)
+                                {
+                                    node.ParentNode.RemoveChild(node);
+                                }
+                            }
+                        }
+
+                        // Remove other categories inside Environment_Group (like Environment_Aliases, etc.)
+                        var otherCategoriesToRemove = new List<XmlNode>();
+                        foreach (XmlNode innerCategory in category.SelectNodes("Category"))
+                        {
+                            string innerName = innerCategory.Attributes?["name"]?.Value;
+                            if (innerName != "Environment_FontsAndColors")
+                            {
+                                otherCategoriesToRemove.Add(innerCategory);
+                            }
+                        }
+                        foreach (XmlNode node in otherCategoriesToRemove)
+                        {
+                            category.RemoveChild(node);
+                        }
+                    }
+                    else if (topLevelCategoriesToKeep.Contains(categoryName))
+                    {
+                        // Keep this category - it's defined in the mode settings
+                        // Filter properties to only keep ones defined in the mode
+                        XmlNode modeCategory = modeUserSettings.SelectSingleNode($"Category[@name='{categoryName}']");
+                        if (modeCategory != null)
+                        {
+                            var modePropertyNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                            foreach (XmlNode prop in modeCategory.SelectNodes("PropertyValue"))
+                            {
+                                string propName = prop.Attributes?["name"]?.Value;
+                                if (!string.IsNullOrEmpty(propName))
+                                {
+                                    modePropertyNames.Add(propName);
+                                }
+                            }
+
+                            // Remove properties not in mode settings
+                            var propsToRemove = new List<XmlNode>();
+                            foreach (XmlNode prop in category.SelectNodes("PropertyValue"))
+                            {
+                                string propName = prop.Attributes?["name"]?.Value;
+                                if (!modePropertyNames.Contains(propName))
+                                {
+                                    propsToRemove.Add(prop);
+                                }
+                            }
+                            foreach (XmlNode node in propsToRemove)
+                            {
+                                category.RemoveChild(node);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Remove other top-level categories entirely
+                        topLevelToRemove.Add(category);
+                    }
+                }
+
+                foreach (XmlNode node in topLevelToRemove)
+                {
+                    exportUserSettings.RemoveChild(node);
+                }
+
+                exportDoc.Save(destPath);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to filter settings file: {ex.Message}");
+                File.Copy(sourcePath, destPath, true);
             }
         }
 
@@ -236,39 +503,52 @@ namespace Modes
                 var doc = new XmlDocument();
                 doc.Load(settingsFilePath);
 
-                XmlNodeList categoryNodes = doc.SelectNodes("/UserSettings/ToolsOptions/ToolsOptionsCategory");
-                if (categoryNodes == null)
+                // Parse ToolsOptions categories (e.g., Environment/General, TextEditor/CSharp)
+                XmlNodeList toolsOptionsCategoryNodes = doc.SelectNodes("/UserSettings/ToolsOptions/ToolsOptionsCategory");
+                if (toolsOptionsCategoryNodes != null)
                 {
-                    return categories;
-                }
-
-                // Parse categories and subcategories from the vssettings XML structure
-                foreach (XmlNode category in categoryNodes)
-                {
-                    string categoryName = category.Attributes?["name"]?.Value;
-                    if (string.IsNullOrEmpty(categoryName))
+                    foreach (XmlNode category in toolsOptionsCategoryNodes)
                     {
-                        continue;
-                    }
-
-                    // Get all subcategories within this category
-                    XmlNodeList subCategoryNodes = category.SelectNodes("ToolsOptionsSubCategory");
-                    if (subCategoryNodes != null && subCategoryNodes.Count > 0)
-                    {
-                        foreach (XmlNode subCategory in subCategoryNodes)
+                        string categoryName = category.Attributes?["name"]?.Value;
+                        if (string.IsNullOrEmpty(categoryName))
                         {
-                            string subCategoryName = subCategory.Attributes?["name"]?.Value;
-                            if (!string.IsNullOrEmpty(subCategoryName))
+                            continue;
+                        }
+
+                        // Get all subcategories within this category
+                        XmlNodeList subCategoryNodes = category.SelectNodes("ToolsOptionsSubCategory");
+                        if (subCategoryNodes != null && subCategoryNodes.Count > 0)
+                        {
+                            foreach (XmlNode subCategory in subCategoryNodes)
                             {
-                                // Format: "Environment/General" or "TextEditor/CSharp"
-                                categories.Add($"{categoryName}/{subCategoryName}");
+                                string subCategoryName = subCategory.Attributes?["name"]?.Value;
+                                if (!string.IsNullOrEmpty(subCategoryName))
+                                {
+                                    // Format: "Environment/General" or "TextEditor/CSharp"
+                                    categories.Add($"{categoryName}/{subCategoryName}");
+                                }
                             }
                         }
+                        else
+                        {
+                            // Category without subcategories
+                            categories.Add(categoryName);
+                        }
                     }
-                    else
+                }
+
+                // Parse top-level Category elements (e.g., Environment_FontsAndColors)
+                // These are used for fonts, colors, keybindings, etc.
+                XmlNodeList topLevelCategoryNodes = doc.SelectNodes("/UserSettings/Category");
+                if (topLevelCategoryNodes != null)
+                {
+                    foreach (XmlNode category in topLevelCategoryNodes)
                     {
-                        // Category without subcategories
-                        categories.Add(categoryName);
+                        string categoryName = category.Attributes?["name"]?.Value;
+                        if (!string.IsNullOrEmpty(categoryName))
+                        {
+                            categories.Add(categoryName);
+                        }
                     }
                 }
             }

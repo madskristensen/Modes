@@ -3,7 +3,7 @@
     <Metadata>
         <Identity Id="Modes.428ec7ea-b605-49cd-a32e-415bfa035ff2" Version="1.0" Language="en-US" Publisher="Mads Kristensen" />
         <DisplayName>Modes</DisplayName>
-        <Description xml:space="preserve">One-click access to optimized Visual Studio configurations. Switch between Low Power, Focus, Performance, and Presenter modes instantly—your settings are automatically backed up and restored.</Description>
+        <Description xml:space="preserve">One-click access to optimized Visual Studio configurations. Switch between Low Power, Focus, Performance, and Presenter modes instantly</Description>
         <MoreInfo>https://github.com/madskristensen/Modes</MoreInfo>
         <License>Resources\LICENSE.txt</License>
         <Icon>Resources\Icon.png</Icon>
