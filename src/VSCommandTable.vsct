@@ -13,7 +13,7 @@
         <Parent guid="VSMainMenu" id="Tools.OptionsGroup"/>
         <Strings>
           <ButtonText>Modes</ButtonText>
-			<LocCanonicalName>Modes.Menu</LocCanonicalName>
+          <LocCanonicalName>Modes.Menu</LocCanonicalName>
         </Strings>
       </Menu>
     </Menus>
@@ -37,7 +37,7 @@
       <!-- Low Power Mode -->
       <Button guid="Modes" id="LowPowerCommand" priority="0x0100" type="Button">
         <Parent guid="Modes" id="ModeCommandsGroup" />
-        <Icon guid="ImageCatalogGuid" id="FlagRed" />
+        <Icon guid="ImageCatalogGuid" id="PowerSupply" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Low power mode</ButtonText>
@@ -48,7 +48,7 @@
       <!-- Focus Mode -->
       <Button guid="Modes" id="FocusCommand" priority="0x0200" type="Button">
         <Parent guid="Modes" id="ModeCommandsGroup" />
-        <Icon guid="ImageCatalogGuid" id="FlagGreen" />
+        <Icon guid="ImageCatalogGuid" id="User" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Focus mode</ButtonText>
@@ -59,7 +59,7 @@
       <!-- Performance Mode -->
       <Button guid="Modes" id="PerformanceCommand" priority="0x0300" type="Button">
         <Parent guid="Modes" id="ModeCommandsGroup" />
-        <Icon guid="ImageCatalogGuid" id="FlagPurple" />
+        <Icon guid="ImageCatalogGuid" id="PerformanceWizard" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Performance mode</ButtonText>
@@ -70,7 +70,7 @@
       <!-- Presenter Mode -->
       <Button guid="Modes" id="PresenterCommand" priority="0x0400" type="Button">
         <Parent guid="Modes" id="ModeCommandsGroup" />
-        <Icon guid="ImageCatalogGuid" id="FlagTurquoise" />
+        <Icon guid="ImageCatalogGuid" id="InkPresenter" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
           <ButtonText>Presenter mode</ButtonText>

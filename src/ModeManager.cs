@@ -4,9 +4,11 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Xml;
 using Community.VisualStudio.Toolkit;
 using EnvDTE80;
 using Microsoft.VisualStudio.Imaging;
+using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
@@ -130,7 +132,8 @@ namespace Modes
                     if (!_activeMode.HasValue)
                     {
                         // Export current settings as baseline before applying first mode
-                        await ExportBaselineAsync();
+                        // Only export the settings that will be modified by this mode
+                        await ExportBaselineAsync(mode);
                     }
 
                     _activeMode = mode;
@@ -173,9 +176,10 @@ namespace Modes
         }
 
         /// <summary>
-        /// Exports current settings as the baseline backup.
+        /// Exports current settings as the baseline backup, filtered to only include
+        /// the settings that the specified mode will change.
         /// </summary>
-        private async Task ExportBaselineAsync()
+        private async Task ExportBaselineAsync(ModeType mode)
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
@@ -191,14 +195,89 @@ namespace Modes
                 DTE2 dte = await VS.GetServiceAsync<EnvDTE.DTE, DTE2>();
                 if (dte != null)
                 {
-                    // Export current settings using DTE
-                    dte.ExecuteCommand("Tools.ImportandExportSettings", $"/export:\"{_baselineBackupPath}\"");
+                    // Get the categories that the mode's settings file will modify
+                    string modeSettingsPath = _modeSettingsFiles[mode];
+                    List<string> categories = GetCategoriesFromSettingsFile(modeSettingsPath);
+
+                    if (categories.Count > 0)
+                    {
+                        // Export only the categories that will be modified by the mode
+                        string categoryFilter = string.Join(";", categories);
+                        dte.ExecuteCommand("Tools.ImportandExportSettings", $"/export:\"{_baselineBackupPath}\" /subset:\"{categoryFilter}\"");
+                    }
+                    else
+                    {
+                        // Fallback to full export if we couldn't parse categories
+                        dte.ExecuteCommand("Tools.ImportandExportSettings", $"/export:\"{_baselineBackupPath}\"");
+                    }
                 }
             }
             catch (Exception ex)
             {
                 await ex.LogAsync();
             }
+        }
+
+        /// <summary>
+        /// Parses a .vssettings file and extracts the category paths for filtering exports.
+        /// Returns paths in the format "Category/SubCategory" as used by VS export command.
+        /// </summary>
+        private List<string> GetCategoriesFromSettingsFile(string settingsFilePath)
+        {
+            var categories = new List<string>();
+
+            try
+            {
+                if (!File.Exists(settingsFilePath))
+                {
+                    return categories;
+                }
+
+                var doc = new XmlDocument();
+                doc.Load(settingsFilePath);
+
+                XmlNodeList categoryNodes = doc.SelectNodes("/UserSettings/ToolsOptions/ToolsOptionsCategory");
+                if (categoryNodes == null)
+                {
+                    return categories;
+                }
+
+                // Parse categories and subcategories from the vssettings XML structure
+                foreach (XmlNode category in categoryNodes)
+                {
+                    string categoryName = category.Attributes?["name"]?.Value;
+                    if (string.IsNullOrEmpty(categoryName))
+                    {
+                        continue;
+                    }
+
+                    // Get all subcategories within this category
+                    XmlNodeList subCategoryNodes = category.SelectNodes("ToolsOptionsSubCategory");
+                    if (subCategoryNodes != null && subCategoryNodes.Count > 0)
+                    {
+                        foreach (XmlNode subCategory in subCategoryNodes)
+                        {
+                            string subCategoryName = subCategory.Attributes?["name"]?.Value;
+                            if (!string.IsNullOrEmpty(subCategoryName))
+                            {
+                                // Format: "Environment/General" or "TextEditor/CSharp"
+                                categories.Add($"{categoryName}/{subCategoryName}");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Category without subcategories
+                        categories.Add(categoryName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to parse settings file: {ex.Message}");
+            }
+
+            return categories;
         }
 
         /// <summary>
@@ -376,29 +455,35 @@ namespace Modes
         private FrameworkElement CreateModeIndicator(ModeType mode)
         {
             string modeName;
+            ImageMoniker moniker;
 
             switch (mode)
             {
                 case ModeType.LowPower:
                     modeName = "Low Power";
+                    moniker = KnownMonikers.PowerSupply;
                     break;
                 case ModeType.Focus:
                     modeName = "Focus";
+                    moniker = KnownMonikers.User;
                     break;
                 case ModeType.Performance:
                     modeName = "Performance";
+                    moniker = KnownMonikers.PerformanceWizard;
                     break;
                 case ModeType.Presenter:
                     modeName = "Presenter";
+                    moniker = KnownMonikers.InkPresenter;
                     break;
                 default:
                     modeName = mode.ToString();
+                    moniker = KnownMonikers.FlagOutline;
                     break;
             }
 
             var indicator = new CrispImage
             {
-                Moniker = KnownMonikers.FlagOutline,
+                Moniker = moniker,
                 Width = 16,
                 Height = 16,
                 ToolTip = $"{modeName} Mode is active. Click to disable.",
