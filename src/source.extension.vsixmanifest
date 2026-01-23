@@ -8,7 +8,7 @@
         <License>Resources\LICENSE.txt</License>
         <Icon>Resources\Icon.png</Icon>
         <PreviewImage>Resources\Icon.png</PreviewImage>
-        <Tags>zen, focus, performance, battery, power, presenter, modes, settings</Tags>
+        <Tags>zen, focus, performance, battery, power, presenter</Tags>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">

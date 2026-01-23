@@ -14,7 +14,7 @@ namespace Modes
         public const string Language = "en-US";
         public const string Version = "1.0";
         public const string Author = "Mads Kristensen";
-        public const string Tags = "zen, focus, performance, battery, power, presenter, modes, settings";
+        public const string Tags = "zen, focus, performance, battery, power, presenter";
         public const bool IsPreview = false;
     }
 }
