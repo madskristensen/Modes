@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Presenter Mode: Increases font sizes for better visibility during presentations and screen sharing -->
+<UserSettings>
+	<ApplicationIdentity version="18.0"/>
+	<ToolsOptions>
+		<ToolsOptionsCategory name="Environment" RegisteredName="Environment">
+			<ToolsOptionsSubCategory name="General" RegisteredName="General" PackageName="CVsShellPackage">
+				<!-- Enable animations for polished presentation experience -->
+				<PropertyValue name="AnimateEnvironmentTools">true</PropertyValue>
+			</ToolsOptionsSubCategory>
+		</ToolsOptionsCategory>
+	</ToolsOptions>
+	<Category name="Environment_FontsAndColors" Category="{1EDA5DD4-927A-43a7-810E-7FD247D0DA1D}" Package="{DA9FB551-C724-11d0-AE1F-00A0C90FFFC3}" RegisteredName="Environment_FontsAndColors" PackageName="Visual Studio Environment Font And Color Package">
+		<FontsAndColors Version="2.0">
+			<Theme Id="{DE3DBBCD-F642-433C-8353-8F1DF4370ABA}" />
+			<!-- Text Editor - Larger font for code readability -->
+			<Category Guid="{A27B4E24-A735-4D1D-B8E7-9716E1E3D8E0}" FontName="Cascadia Code" FontSize="16" CharSet="1" FontIsDefault="No">
+			</Category>
+			<!-- Statement Completion - Larger IntelliSense popup -->
+			<Category Guid="{C1614BB1-734F-4A31-BD42-5AE6275E16D2}" FontName="Cascadia Code" FontSize="14" CharSet="1" FontIsDefault="No">
+			</Category>
+			<!-- Editor Tooltip - Larger tooltips -->
+			<Category Guid="{39E65C74-22CA-4833-BBFC-9E5CFA8CADBD}" FontName="Cascadia Code" FontSize="14" CharSet="1" FontIsDefault="No">
+			</Category>
+			<!-- Environment Font - Larger UI elements -->
+			<Category Guid="{1F987C00-E7C4-4869-8A17-23FD602268B0}" FontName="Segoe UI" FontSize="11" CharSet="1" FontIsDefault="No">
+			</Category>
+			<!-- Output Window - Larger output text -->
+			<Category Guid="{9973EFDF-317D-431C-8BC1-5E88CBFD4F7F}" FontName="Cascadia Code" FontSize="14" CharSet="1" FontIsDefault="No">
+			</Category>
+			<!-- Find Results - Larger search results -->
+			<Category Guid="{8E334906-064A-4D04-B311-3B4BF0919D34}" FontName="Cascadia Code" FontSize="14" CharSet="1" FontIsDefault="No">
+			</Category>
+			<!-- Terminal - Larger terminal text -->
+			<Category Guid="{19659D73-4020-4E7C-9E4E-3A95BFD76D2B}" FontName="Cascadia Code" FontSize="14" CharSet="1" FontIsDefault="No">
+			</Category>
+		</FontsAndColors>
+	</Category>
+</UserSettings>

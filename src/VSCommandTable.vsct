@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <Extern href="stdidcmd.h"/>
+  <Extern href="vsshlids.h"/>
+  <Include href="KnownImageIds.vsct"/>
+  <Include href="VSGlobals.vsct"/>
+
+  <Commands package="Modes">
+    <!-- Menu containing the Modes submenu -->
+    <Menus>
+      <Menu guid="Modes" id="ModesSubMenu" priority="0x0100" type="Menu">
+        <Parent guid="VSMainMenu" id="Tools.OptionsGroup"/>
+        <Strings>
+          <ButtonText>Modes</ButtonText>
+			<LocCanonicalName>Modes.Menu</LocCanonicalName>
+        </Strings>
+      </Menu>
+    </Menus>
+
+    <Groups>
+      <!-- Group that places the Modes submenu near bottom of Tools menu, above Theme (IDG_VS_TOOLS_OPTIONS = 0x0500) -->
+      <Group guid="Modes" id="ModesMenuGroup" priority="0x0450">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS"/>
+      </Group>
+      <!-- Group containing the mode toggle commands inside the Modes submenu -->
+      <Group guid="Modes" id="ModeCommandsGroup" priority="0x0100">
+        <Parent guid="Modes" id="ModesSubMenu"/>
+      </Group>
+    </Groups>
+
+    <Buttons>
+      <!-- Low Power Mode -->
+      <Button guid="Modes" id="LowPowerCommand" priority="0x0100" type="Button">
+        <Parent guid="Modes" id="ModeCommandsGroup" />
+        <Icon guid="ImageCatalogGuid" id="Battery" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Low Power</ButtonText>
+          <LocCanonicalName>.Modes.LowPower</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <!-- Focus Mode -->
+      <Button guid="Modes" id="FocusCommand" priority="0x0200" type="Button">
+        <Parent guid="Modes" id="ModeCommandsGroup" />
+        <Icon guid="ImageCatalogGuid" id="ZoomIn" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Focus</ButtonText>
+          <LocCanonicalName>.Modes.Focus</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <!-- Performance Mode -->
+      <Button guid="Modes" id="PerformanceCommand" priority="0x0300" type="Button">
+        <Parent guid="Modes" id="ModeCommandsGroup" />
+        <Icon guid="ImageCatalogGuid" id="Performance" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Performance</ButtonText>
+          <LocCanonicalName>.Modes.Performance</LocCanonicalName>
+        </Strings>
+      </Button>
+
+      <!-- Presenter Mode -->
+      <Button guid="Modes" id="PresenterCommand" priority="0x0400" type="Button">
+        <Parent guid="Modes" id="ModeCommandsGroup" />
+        <Icon guid="ImageCatalogGuid" id="FitToScreen" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Presenter</ButtonText>
+          <LocCanonicalName>.Modes.Presenter</LocCanonicalName>
+        </Strings>
+      </Button>
+    </Buttons>
+  </Commands>
+
+  <Symbols>
+    <GuidSymbol name="Modes" value="{7c697c09-64b1-4dc2-ba0b-955215206732}">
+      <IDSymbol name="ModesMenuGroup" value="0x0001" />
+      <IDSymbol name="ModesSubMenu" value="0x0002" />
+      <IDSymbol name="ModeCommandsGroup" value="0x0003" />
+      <IDSymbol name="LowPowerCommand" value="0x0100" />
+      <IDSymbol name="FocusCommand" value="0x0101" />
+      <IDSymbol name="PerformanceCommand" value="0x0102" />
+      <IDSymbol name="PresenterCommand" value="0x0103" />
+    </GuidSymbol>
+  </Symbols>
+</CommandTable>

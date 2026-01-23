@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json.schemastore.org/vsix-publish",
+  "categories": [ "coding", "documentation" ],
+  "identity": {
+    "internalName": "Modes",
+    "tags": [ "zen", "performance", "focus", "battery", "power" ]
+  },
+  "assetFiles": [
+
+  ],
+  "overview": "README.md",
+  "publisher": "MadsKristensen",
+  "repo": "https://github.com/madskristensen/Modes"
+}

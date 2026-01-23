@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Low Power Mode: Optimizes Visual Studio for battery saving by disabling background tasks, animations, and performance-heavy features -->
+<UserSettings>
+	<ApplicationIdentity version="18.0"/>
+	<ToolsOptions>
+		<ToolsOptionsCategory name="Environment" RegisteredName="Environment">
+			<ToolsOptionsSubCategory name="General" RegisteredName="General" PackageName="CVsShellPackage">
+				<!-- Disable animations to reduce CPU/GPU usage -->
+				<PropertyValue name="AnimateEnvironmentTools">false</PropertyValue>
+				<!-- Disable hardware acceleration to reduce GPU usage -->
+				<PropertyValue name="UseHardwareGraphicsAcceleration">false</PropertyValue>
+				<!-- Disable automatic visual experience adjustment -->
+				<PropertyValue name="AutoAdjustExperience">false</PropertyValue>
+			</ToolsOptionsSubCategory>
+			<ToolsOptionsSubCategory name="Documents" RegisteredName="Documents" PackageName="CVsShellPackage">
+				<!-- Disable external file monitoring to reduce disk I/O -->
+				<PropertyValue name="DetectFileChangesOutsideIDE">false</PropertyValue>
+				<PropertyValue name="AutoloadExternalChanges">false</PropertyValue>
+				<!-- Don't reopen documents on solution load for faster startup -->
+				<PropertyValue name="ReopenDocumentsOnSolutionLoad">false</PropertyValue>
+			</ToolsOptionsSubCategory>
+			<ToolsOptionsSubCategory name="ProductUpdates" RegisteredName="ProductUpdates" PackageName="SetupCompositionPackage">
+				<!-- Disable background downloads to save battery -->
+				<PropertyValue name="IsBackgroundDownloadEnabled">false</PropertyValue>
+			</ToolsOptionsSubCategory>
+			<ToolsOptionsSubCategory name="ProjectsAndSolution" RegisteredName="ProjectsAndSolution" PackageName="CVsShellPackage">
+				<!-- Don't restore Solution Explorer hierarchy on load - causes delays -->
+				<PropertyValue name="RestoreSolutionExplorerProjectHierarchyState">false</PropertyValue>
+				<!-- Disable automatic tracking in Solution Explorer -->
+				<PropertyValue name="TrackFileSelectionInExplorer">false</PropertyValue>
+				<!-- Reduce parallel builds to save CPU -->
+				<PropertyValue name="ConcurrentBuilds">1</PropertyValue>
+				<!-- Minimal MSBuild output verbosity -->
+				<PropertyValue name="MSBuildOutputVerbosity">0</PropertyValue>
+				<!-- Don't show output window before build -->
+				<PropertyValue name="ShowOutputWindowBeforeBuild">false</PropertyValue>
+				<!-- Run when out of date without prompting -->
+				<PropertyValue name="OnRunWhenOutOfDate">1</PropertyValue>
+				<!-- Only build startup projects for faster F5 -->
+				<PropertyValue name="OnlySaveStartupProjectsAndDependencies">true</PropertyValue>
+			</ToolsOptionsSubCategory>
+		</ToolsOptionsCategory>
+		<ToolsOptionsCategory name="Debugger" RegisteredName="Debugger">
+			<ToolsOptionsSubCategory name="General" RegisteredName="General" PackageName="Debugger">
+				<!-- Disable diagnostic tools while debugging to save CPU/memory -->
+				<PropertyValue name="EnableDiagnosticTools">false</PropertyValue>
+				<!-- Enable Just My Code to skip stepping through framework/external code -->
+				<PropertyValue name="EnableJustMyCode">true</PropertyValue>
+			</ToolsOptionsSubCategory>
+		</ToolsOptionsCategory>
+		<ToolsOptionsCategory name="TextEditor" RegisteredName="TextEditor">
+			<ToolsOptionsSubCategory name="AllLanguages" RegisteredName="AllLanguages" PackageName="CTextPackage">
+				<!-- Disable CodeLens to save CPU -->
+				<PropertyValue name="CodeLens">false</PropertyValue>
+				<!-- Disable word wrap -->
+				<PropertyValue name="WordWrap">false</PropertyValue>
+			</ToolsOptionsSubCategory>
+			<ToolsOptionsSubCategory name="CSharp-Specific" RegisteredName="CSharp-Specific" PackageName="CSharpPackage">
+				<!-- Run background code analysis for open documents only (not full solution) -->
+				<PropertyValue name="BackgroundAnalysisScopeOption">1</PropertyValue>
+				<!-- Disable expensive IntelliSense features -->
+				<PropertyValue name="ShowItemsFromUnimportedNamespaces">0</PropertyValue>
+				<PropertyValue name="AddImport_SuggestForTypesInNuGetPackages">0</PropertyValue>
+				<PropertyValue name="AddImport_SuggestForTypesInReferenceAssemblies">0</PropertyValue>
+				<!-- Disable closed file diagnostics (saves CPU) -->
+				<PropertyValue name="CSharpClosedFileDiagnostics">0</PropertyValue>
+				<PropertyValue name="ClosedFileDiagnostics">0</PropertyValue>
+				<!-- Skip analyzers on implicit builds -->
+				<PropertyValue name="SkipAnalyzersForImplicitlyTriggeredBuilds">1</PropertyValue>
+				<!-- Disable code lens features -->
+				<PropertyValue name="HighlightReferences">0</PropertyValue>
+				<PropertyValue name="EnableHighlightRelatedKeywords">0</PropertyValue>
+				<!-- Disable inline hints - reduces typing delay -->
+				<PropertyValue name="InlineParameterNameHints">0</PropertyValue>
+				<PropertyValue name="InlineTypeHints">0</PropertyValue>
+				<!-- Disable line separators -->
+				<PropertyValue name="DisplayLineSeparators">0</PropertyValue>
+			</ToolsOptionsSubCategory>
+			<ToolsOptionsSubCategory name="Basic-Specific" RegisteredName="Basic-Specific" PackageName="VisualBasicPackage">
+				<!-- Disable expensive IntelliSense features for VB -->
+				<PropertyValue name="Option_ShowItemsFromUnimportedNamespaces">0</PropertyValue>
+				<PropertyValue name="Option_SuggestImportsForTypesInNuGetPackages">false</PropertyValue>
+				<PropertyValue name="Option_SuggestImportsForTypesInReferenceAssemblies">false</PropertyValue>
+				<PropertyValue name="BasicClosedFileDiagnostics">0</PropertyValue>
+				<PropertyValue name="ClosedFileDiagnostics">false</PropertyValue>
+				<PropertyValue name="SkipAnalyzersForImplicitlyTriggeredBuilds">1</PropertyValue>
+				<PropertyValue name="EnableHighlightReferences">false</PropertyValue>
+				<PropertyValue name="EnableHighlightRelatedKeywords">false</PropertyValue>
+				<!-- Disable inline hints -->
+				<PropertyValue name="InlineParameterNameHints">false</PropertyValue>
+				<PropertyValue name="InlineTypeHints">false</PropertyValue>
+				<PropertyValue name="DisplayLineSeparators">false</PropertyValue>
+			</ToolsOptionsSubCategory>
+			<ToolsOptionsSubCategory name="CSharp" RegisteredName="CSharp" PackageName="CTextPackage">
+				<!-- Use bar mode instead of map mode for vertical scrollbar -->
+				<PropertyValue name="UseMapMode">false</PropertyValue>
+				<!-- Disable scrollbar annotations -->
+				<PropertyValue name="ShowAnnotations">false</PropertyValue>
+				<PropertyValue name="ShowChanges">false</PropertyValue>
+				<PropertyValue name="ShowMarks">false</PropertyValue>
+			</ToolsOptionsSubCategory>
+			<ToolsOptionsSubCategory name="Basic" RegisteredName="Basic" PackageName="CTextPackage">
+				<!-- Use bar mode instead of map mode for vertical scrollbar -->
+				<PropertyValue name="UseMapMode">false</PropertyValue>
+				<!-- Disable scrollbar annotations -->
+				<PropertyValue name="ShowAnnotations">false</PropertyValue>
+				<PropertyValue name="ShowChanges">false</PropertyValue>
+				<PropertyValue name="ShowMarks">false</PropertyValue>
+			</ToolsOptionsSubCategory>
+		</ToolsOptionsCategory>
+	</ToolsOptions>
+</UserSettings>

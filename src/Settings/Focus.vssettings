@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Focus Mode: Minimizes distractions for focused, deep-work coding sessions -->
+<UserSettings>
+	<ApplicationIdentity version="18.0"/>
+	<ToolsOptions>
+		<ToolsOptionsCategory name="Environment" RegisteredName="Environment">
+			<ToolsOptionsSubCategory name="General" RegisteredName="General" PackageName="CVsShellPackage">
+				<!-- Disable animations to reduce visual noise -->
+				<PropertyValue name="AnimateEnvironmentTools">false</PropertyValue>
+				<!-- Keep consistent visual experience -->
+				<PropertyValue name="AutoAdjustExperience">false</PropertyValue>
+			</ToolsOptionsSubCategory>
+			<ToolsOptionsSubCategory name="FindAndReplace" RegisteredName="FindAndReplace" PackageName="CVsShellPackage">
+				<!-- Disable warning messages to reduce interruptions -->
+				<PropertyValue name="ShowWarningMessages">false</PropertyValue>
+				<PropertyValue name="ShowMessageBoxes">false</PropertyValue>
+			</ToolsOptionsSubCategory>
+			<ToolsOptionsSubCategory name="TaskList" RegisteredName="TaskList" PackageName="ErrorListPackage">
+				<!-- Disable task deletion confirmation -->
+				<PropertyValue name="ConfirmTaskDeletion">false</PropertyValue>
+				<PropertyValue name="WarnOnAddingHiddenItem">false</PropertyValue>
+			</ToolsOptionsSubCategory>
+			<ToolsOptionsSubCategory name="ProjectsAndSolution" RegisteredName="ProjectsAndSolution" PackageName="CVsShellPackage">
+				<!-- Don't show output window before build -->
+				<PropertyValue name="ShowOutputWindowBeforeBuild">false</PropertyValue>
+				<!-- Don't show task list after build -->
+				<PropertyValue name="ShowTaskListAfterBuild">false</PropertyValue>
+			</ToolsOptionsSubCategory>
+		</ToolsOptionsCategory>
+		<ToolsOptionsCategory name="TextEditor" RegisteredName="TextEditor">
+			<ToolsOptionsSubCategory name="AllLanguages" RegisteredName="AllLanguages" PackageName="CTextPackage">
+				<!-- Disable CodeLens for cleaner UI -->
+				<PropertyValue name="CodeLens">false</PropertyValue>
+			</ToolsOptionsSubCategory>
+			<ToolsOptionsSubCategory name="CSharp" RegisteredName="CSharp" PackageName="CTextPackage">
+				<!-- Hide navigation bar for cleaner UI -->
+				<PropertyValue name="ShowNavigationBar">false</PropertyValue>
+				<!-- Use bar mode instead of map mode for vertical scrollbar -->
+				<PropertyValue name="UseMapMode">false</PropertyValue>
+				<!-- Hide scrollbar annotations -->
+				<PropertyValue name="ShowAnnotations">false</PropertyValue>
+				<PropertyValue name="ShowChanges">false</PropertyValue>
+				<PropertyValue name="ShowMarks">false</PropertyValue>
+				<PropertyValue name="ShowErrors">false</PropertyValue>
+				<!-- Disable caret position display -->
+				<PropertyValue name="ShowCaretPosition">false</PropertyValue>
+			</ToolsOptionsSubCategory>
+			<ToolsOptionsSubCategory name="Basic" RegisteredName="Basic" PackageName="CTextPackage">
+				<!-- Hide navigation bar for cleaner UI -->
+				<PropertyValue name="ShowNavigationBar">false</PropertyValue>
+				<!-- Use bar mode instead of map mode for vertical scrollbar -->
+				<PropertyValue name="UseMapMode">false</PropertyValue>
+				<!-- Hide scrollbar annotations -->
+				<PropertyValue name="ShowAnnotations">false</PropertyValue>
+				<PropertyValue name="ShowChanges">false</PropertyValue>
+				<PropertyValue name="ShowMarks">false</PropertyValue>
+				<PropertyValue name="ShowErrors">false</PropertyValue>
+				<PropertyValue name="ShowCaretPosition">false</PropertyValue>
+			</ToolsOptionsSubCategory>
+			<ToolsOptionsSubCategory name="CSharp-Specific" RegisteredName="CSharp-Specific" PackageName="CSharpPackage">
+				<!-- Disable inline hints for cleaner view -->
+				<PropertyValue name="DisplayLineSeparators">0</PropertyValue>
+				<!-- Disable inline parameter hints -->
+				<PropertyValue name="InlineParameterNameHints">0</PropertyValue>
+				<PropertyValue name="InlineTypeHints">0</PropertyValue>
+				<!-- Disable fading for cleaner appearance -->
+				<PropertyValue name="Fading_FadeOutUnreachableCode">0</PropertyValue>
+				<PropertyValue name="Fading_FadeOutUnusedImports">0</PropertyValue>
+				<PropertyValue name="Fading_FadeOutUnusedMembers">0</PropertyValue>
+			</ToolsOptionsSubCategory>
+			<ToolsOptionsSubCategory name="Basic-Specific" RegisteredName="Basic-Specific" PackageName="VisualBasicPackage">
+				<!-- Disable line separators -->
+				<PropertyValue name="DisplayLineSeparators">false</PropertyValue>
+				<!-- Disable inline hints -->
+				<PropertyValue name="InlineParameterNameHints">false</PropertyValue>
+				<PropertyValue name="InlineTypeHints">false</PropertyValue>
+				<!-- Disable fading -->
+				<PropertyValue name="Fading_FadeOutUnreachableCode">false</PropertyValue>
+				<PropertyValue name="Fading_FadeOutUnusedImports">false</PropertyValue>
+				<PropertyValue name="Fading_FadeOutUnusedMembers">false</PropertyValue>
+			</ToolsOptionsSubCategory>
+		</ToolsOptionsCategory>
+	</ToolsOptions>
+</UserSettings>
