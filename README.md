@@ -14,6 +14,15 @@ A Visual Studio extension that provides toggleable modes to quickly switch betwe
 - **Status bar indicators** show active mode (click to toggle)
 - **Baseline backup** automatically saves your settings before first mode activation
 - **Session persistence** remembers active mode across VS restarts
+- **Auto Low Power mode** - automatically enables Low Power mode when Windows enters battery saver mode (configurable in Tools > Options > Modes)
+
+## Options
+
+Access options via **Tools > Options > Modes > General**:
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| Auto-enable Low Power mode | true | Automatically enable Low Power mode when Windows enters power saver/battery saver mode. Disables when Windows exits power saver mode. |
 
 ## Modes
 
