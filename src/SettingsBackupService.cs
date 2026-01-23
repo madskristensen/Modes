@@ -117,14 +117,33 @@ namespace Modes
         }
 
         /// <summary>
+        /// Creates a backup asynchronously. Preferred over synchronous version.
+        /// For use from UI dialogs that support async.
+        /// </summary>
+        public async Task CreateBackupAndRefreshAsync()
+        {
+            await CreateBackupAsync();
+        }
+
+        /// <summary>
         /// Creates a backup synchronously. For use from UI dialogs.
+        /// Warning: This blocks the calling thread. Prefer CreateBackupAndRefreshAsync when possible.
         /// </summary>
         public void CreateBackup()
         {
-            ThreadHelper.JoinableTaskFactory.Run(async () =>
+            // Use RunAsync with FireAndForget to avoid blocking the UI thread
+            // The dialog will need to refresh after a brief delay
+            ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
             {
-                await CreateBackupAsync();
-            });
+                try
+                {
+                    await CreateBackupAsync();
+                }
+                catch (Exception ex)
+                {
+                    await ex.LogAsync();
+                }
+            }).FireAndForget();
         }
 
         private void LoadLastBackupTime()
@@ -138,8 +157,20 @@ namespace Modes
 
         private void OnIdleCheckTimer(object state)
         {
+            // Early exit if disposed to prevent race conditions
+            if (_disposed)
+            {
+                return;
+            }
+
             ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
             {
+                // Double-check disposal after async context switch
+                if (_disposed)
+                {
+                    return;
+                }
+
                 try
                 {
                     General options = await General.GetLiveInstanceAsync();
@@ -223,7 +254,11 @@ namespace Modes
                 return false;
             }
 
-            uint idleTime = (uint)Environment.TickCount - lastInputInfo.dwTime;
+            // Use unchecked subtraction to handle TickCount wraparound correctly
+            // When TickCount overflows (after ~24.9 days), unchecked arithmetic
+            // still produces the correct elapsed time due to unsigned wraparound
+            uint currentTick = unchecked((uint)Environment.TickCount);
+            uint idleTime = unchecked(currentTick - lastInputInfo.dwTime);
             return idleTime >= Constants.Timers.RequiredIdleTimeMs;
         }
 

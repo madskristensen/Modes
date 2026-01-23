@@ -69,32 +69,39 @@ namespace Modes
         {
             JoinableTaskFactory.RunAsync(async () =>
             {
-                General options = await General.GetLiveInstanceAsync();
-
-                if (!options.AutoEnableLowPowerMode)
+                try
                 {
-                    return;
+                    General options = await General.GetLiveInstanceAsync();
+
+                    if (!options.AutoEnableLowPowerMode)
+                    {
+                        return;
+                    }
+
+                    ModeManager manager = ModeManager.Instance;
+
+                    if (e.Mode == PowerModes.StatusChange)
+                    {
+                        // Check if Windows is in battery saver / power saver mode
+                        var isWindowsInPowerSaver = IsWindowsInPowerSaverMode();
+
+                        if (isWindowsInPowerSaver && !manager.IsModeActive(ModeType.LowPower))
+                        {
+                            // Windows entered power saver mode - enable Low Power mode
+                            _wasLowPowerEnabledBySystem = true;
+                            await manager.ToggleModeAsync(ModeType.LowPower);
+                        }
+                        else if (!isWindowsInPowerSaver && _wasLowPowerEnabledBySystem && manager.IsModeActive(ModeType.LowPower))
+                        {
+                            // Windows left power saver mode - disable Low Power mode if we enabled it
+                            _wasLowPowerEnabledBySystem = false;
+                            await manager.ToggleModeAsync(ModeType.LowPower);
+                        }
+                    }
                 }
-
-                ModeManager manager = ModeManager.Instance;
-
-                if (e.Mode == PowerModes.StatusChange)
+                catch (Exception ex)
                 {
-                    // Check if Windows is in battery saver / power saver mode
-                    var isWindowsInPowerSaver = IsWindowsInPowerSaverMode();
-
-                    if (isWindowsInPowerSaver && !manager.IsModeActive(ModeType.LowPower))
-                    {
-                        // Windows entered power saver mode - enable Low Power mode
-                        _wasLowPowerEnabledBySystem = true;
-                        await manager.ToggleModeAsync(ModeType.LowPower);
-                    }
-                    else if (!isWindowsInPowerSaver && _wasLowPowerEnabledBySystem && manager.IsModeActive(ModeType.LowPower))
-                    {
-                        // Windows left power saver mode - disable Low Power mode if we enabled it
-                        _wasLowPowerEnabledBySystem = false;
-                        await manager.ToggleModeAsync(ModeType.LowPower);
-                    }
+                    await ex.LogAsync();
                 }
             }).FireAndForget();
         }

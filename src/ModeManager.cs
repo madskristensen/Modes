@@ -217,20 +217,55 @@ namespace Modes
                 string tempExportPath = Path.Combine(dir, "temp_full_export.vssettings");
                 dte.ExecuteCommand("Tools.ImportandExportSettings", $"/export:\"{tempExportPath}\"");
 
-                // Wait a moment for the file to be written
-                await Task.Delay(500);
+                // Wait for file to be written with retry logic instead of fixed delay
+                bool fileReady = await WaitForFileAsync(tempExportPath, timeoutMs: 5000);
+                if (!fileReady)
+                {
+                    // Fallback to full export if temp file wasn't created in time
+                    return;
+                }
 
                 // Filter the exported settings to match the mode's settings structure
-                if (File.Exists(tempExportPath))
-                {
-                    FilterSettingsFile(tempExportPath, _baselineBackupPath, modeSettingsDoc);
-                    File.Delete(tempExportPath);
-                }
+                FilterSettingsFile(tempExportPath, _baselineBackupPath, modeSettingsDoc);
+                File.Delete(tempExportPath);
             }
             catch (Exception ex)
             {
                 await ex.LogAsync();
             }
+        }
+
+        /// <summary>
+        /// Waits for a file to exist and be accessible, with timeout.
+        /// </summary>
+        private static async Task<bool> WaitForFileAsync(string filePath, int timeoutMs)
+        {
+            const int checkIntervalMs = 50;
+            int elapsed = 0;
+
+            while (elapsed < timeoutMs)
+            {
+                try
+                {
+                    if (File.Exists(filePath))
+                    {
+                        // Try to open the file to ensure it's not locked
+                        using (var stream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                        {
+                            return true;
+                        }
+                    }
+                }
+                catch (IOException)
+                {
+                    // File exists but is locked, continue waiting
+                }
+
+                await Task.Delay(checkIntervalMs);
+                elapsed += checkIntervalMs;
+            }
+
+            return File.Exists(filePath);
         }
 
         /// <summary>

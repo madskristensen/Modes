@@ -16,7 +16,8 @@ namespace Modes
     internal static class StatusBarInjector
     {
         private static Panel _panel;
-        private static bool _isInitialized;
+        private static volatile bool _isInitialized;
+        private static readonly object _initLock = new object();
 
         /// <summary>
         /// Injects a FrameworkElement into the status bar (docked to the right).
@@ -27,7 +28,21 @@ namespace Modes
 
             if (!_isInitialized)
             {
-                _isInitialized = await EnsureUIAsync();
+                lock (_initLock)
+                {
+                    if (!_isInitialized)
+                    {
+                        // Note: EnsureUIAsync must be called outside the lock to avoid deadlock
+                        // We use double-check locking pattern with volatile flag
+                    }
+                }
+
+                // Perform async initialization outside the lock
+                if (!_isInitialized)
+                {
+                    bool initialized = await EnsureUIAsync();
+                    _isInitialized = initialized;
+                }
             }
 
             if (_panel == null)

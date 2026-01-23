@@ -86,11 +86,18 @@ namespace Modes
             }
         }
 
-        private void CreateBackupButton_Click(object sender, RoutedEventArgs e)
+        private async void CreateBackupButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                SettingsBackupService.Instance.CreateBackup();
+                CreateBackupButton.IsEnabled = false;
+                CreateBackupButton.Content = "Creating...";
+
+                await SettingsBackupService.Instance.CreateBackupAndRefreshAsync();
+
+                // Brief delay to ensure file system is updated
+                await System.Threading.Tasks.Task.Delay(100);
+
                 LoadBackups();
 
                 // Select the newly created backup (first in the list)
@@ -102,6 +109,11 @@ namespace Modes
             catch (Exception ex)
             {
                 MessageBox.Show($"Failed to create backup: {ex.Message}", "Modes", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                CreateBackupButton.IsEnabled = true;
+                CreateBackupButton.Content = "Create Backup Now";
             }
         }
 
