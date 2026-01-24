@@ -31,10 +31,10 @@ This extension addresses several popular feature requests from the Visual Studio
 
 ## Modes
 
-- **🔋 Low Power** - Maximize battery life on laptops
-- **🔍 Focus** - Distraction-free coding environment  
-- **🚀 Performance** - Eliminate UI lag and typing delays
-- **🎤 Presenter** - Large fonts for demos and screen sharing
+- **🪫 Low Power** - Maximize battery life on laptops
+- **👤 Focus** - Distraction-free coding environment  
+- **📈 Performance** - Eliminate UI lag and typing delays
+- **🖥️ Presenter** - Large fonts for demos and screen sharing
 
 ## Features
 
