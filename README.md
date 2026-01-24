@@ -121,7 +121,7 @@ Disables features known to cause UI hangs, typing delays, and slow solution load
 
 *Perfect for: Presentations, demos, pair programming, screen sharing*
 
-Increases all font sizes so your audience can actually read your code.
+Increases all font sizes so your audience can actually read your code, and disables hover tooltips that can obscure code during demos.
 
 | Setting                 | Value              |
 | ----------------------- | ------------------ |
@@ -131,6 +131,7 @@ Increases all font sizes so your audience can actually read your code.
 | IntelliSense/Completion | Cascadia Code 14pt |
 | Output Window           | Cascadia Code 14pt |
 | Printer Font            | Cascadia Code 16pt |
+| Quick Info on Hover     | Disabled           |
 | Text Editor Font        | Cascadia Code 16pt |
 | Watch/Locals Windows    | Cascadia Code 14pt |
 

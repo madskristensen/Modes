@@ -51,8 +51,8 @@ namespace Modes
 
         private ModeManager()
         {
-            string extensionDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string settingsDir = Path.Combine(extensionDir, "Settings");
+            var extensionDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var settingsDir = Path.Combine(extensionDir, "Settings");
 
             _modeSettingsFiles = new Dictionary<ModeType, string>
             {
@@ -62,7 +62,7 @@ namespace Modes
                 { ModeType.Presenter, Path.Combine(settingsDir, "Presenter.vssettings") }
             };
 
-            string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             _baselineBackupPath = Path.Combine(appDataPath, Constants.Storage.AppDataFolderName, Constants.Storage.BaselineFileName);
         }
 
@@ -114,7 +114,7 @@ namespace Modes
 
             try
             {
-                bool isCurrentlyActive = _activeMode == mode;
+                var isCurrentlyActive = _activeMode == mode;
 
                 if (isCurrentlyActive)
                 {
@@ -189,7 +189,7 @@ namespace Modes
             try
             {
                 // Ensure the directory exists
-                string dir = Path.GetDirectoryName(_baselineBackupPath);
+                var dir = Path.GetDirectoryName(_baselineBackupPath);
                 if (!Directory.Exists(dir))
                 {
                     Directory.CreateDirectory(dir);
@@ -202,7 +202,7 @@ namespace Modes
                 }
 
                 // Load the mode's settings file to use as a template for filtering
-                string modeSettingsPath = _modeSettingsFiles[mode];
+                var modeSettingsPath = _modeSettingsFiles[mode];
                 if (!File.Exists(modeSettingsPath))
                 {
                     // Fallback to full export
@@ -214,11 +214,11 @@ namespace Modes
                 modeSettingsDoc.Load(modeSettingsPath);
 
                 // Export full settings to a temp file, then filter it
-                string tempExportPath = Path.Combine(dir, "temp_full_export.vssettings");
+                var tempExportPath = Path.Combine(dir, "temp_full_export.vssettings");
                 dte.ExecuteCommand("Tools.ImportandExportSettings", $"/export:\"{tempExportPath}\"");
 
                 // Wait for file to be written with retry logic instead of fixed delay
-                bool fileReady = await WaitForFileAsync(tempExportPath, timeoutMs: 5000);
+                var fileReady = await WaitForFileAsync(tempExportPath, timeoutMs: 5000);
                 if (!fileReady)
                 {
                     // Fallback to full export if temp file wasn't created in time
@@ -241,7 +241,7 @@ namespace Modes
         private static async Task<bool> WaitForFileAsync(string filePath, int timeoutMs)
         {
             const int checkIntervalMs = 50;
-            int elapsed = 0;
+            var elapsed = 0;
 
             while (elapsed < timeoutMs)
             {
@@ -297,17 +297,17 @@ namespace Modes
                 {
                     foreach (XmlNode category in modeToolsOptions.SelectNodes("ToolsOptionsCategory"))
                     {
-                        string categoryName = category.Attributes?["name"]?.Value;
+                        var categoryName = category.Attributes?["name"]?.Value;
                         if (string.IsNullOrEmpty(categoryName)) continue;
 
                         foreach (XmlNode subCategory in category.SelectNodes("ToolsOptionsSubCategory"))
                         {
-                            string subCategoryName = subCategory.Attributes?["name"]?.Value;
+                            var subCategoryName = subCategory.Attributes?["name"]?.Value;
                             if (string.IsNullOrEmpty(subCategoryName)) continue;
 
                             foreach (XmlNode prop in subCategory.SelectNodes("PropertyValue"))
                             {
-                                string propName = prop.Attributes?["name"]?.Value;
+                                var propName = prop.Attributes?["name"]?.Value;
                                 if (!string.IsNullOrEmpty(propName))
                                 {
                                     propertiesToKeep.Add($"{categoryName}/{subCategoryName}/{propName}");
@@ -327,7 +327,7 @@ namespace Modes
                     foreach (XmlNode fontCategory in modeFontsCategory.SelectNodes(".//Category[@GUID or @Guid]"))
                     {
                         // Try both GUID (uppercase) and Guid (mixed case) attributes
-                        string guid = fontCategory.Attributes?["GUID"]?.Value 
+                        var guid = fontCategory.Attributes?["GUID"]?.Value 
                                    ?? fontCategory.Attributes?["Guid"]?.Value;
                         if (!string.IsNullOrEmpty(guid))
                         {
@@ -340,7 +340,7 @@ namespace Modes
                 var topLevelCategoriesToKeep = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 foreach (XmlNode modeCategory in modeUserSettings.SelectNodes("Category"))
                 {
-                    string categoryName = modeCategory.Attributes?["name"]?.Value;
+                    var categoryName = modeCategory.Attributes?["name"]?.Value;
                     if (!string.IsNullOrEmpty(categoryName))
                     {
                         topLevelCategoriesToKeep.Add(categoryName);
@@ -362,22 +362,22 @@ namespace Modes
 
                         foreach (XmlNode category in exportToolsOptions.SelectNodes("ToolsOptionsCategory"))
                         {
-                            string categoryName = category.Attributes?["name"]?.Value;
+                            var categoryName = category.Attributes?["name"]?.Value;
                             if (string.IsNullOrEmpty(categoryName)) continue;
 
                             var subCategoriesToRemove = new List<XmlNode>();
 
                             foreach (XmlNode subCategory in category.SelectNodes("ToolsOptionsSubCategory"))
                             {
-                                string subCategoryName = subCategory.Attributes?["name"]?.Value;
+                                var subCategoryName = subCategory.Attributes?["name"]?.Value;
                                 if (string.IsNullOrEmpty(subCategoryName)) continue;
 
                                 var propsToRemove = new List<XmlNode>();
 
                                 foreach (XmlNode prop in subCategory.SelectNodes("PropertyValue"))
                                 {
-                                    string propName = prop.Attributes?["name"]?.Value;
-                                    string fullPath = $"{categoryName}/{subCategoryName}/{propName}";
+                                    var propName = prop.Attributes?["name"]?.Value;
+                                    var fullPath = $"{categoryName}/{subCategoryName}/{propName}";
 
                                     if (!propertiesToKeep.Contains(fullPath))
                                     {
@@ -420,7 +420,7 @@ namespace Modes
                 var topLevelToRemove = new List<XmlNode>();
                 foreach (XmlNode category in exportUserSettings.SelectNodes("Category"))
                 {
-                    string categoryName = category.Attributes?["name"]?.Value;
+                    var categoryName = category.Attributes?["name"]?.Value;
 
                     if (categoryName == "Environment_Group" && fontCategoryGuidsToKeep.Count > 0)
                     {
@@ -436,7 +436,7 @@ namespace Modes
                                 // Categories are inside Categories/Category elements
                                 foreach (XmlNode fontCategory in fontsAndColors.SelectNodes(".//Category[@GUID or @Guid]"))
                                 {
-                                    string guid = fontCategory.Attributes?["GUID"]?.Value 
+                                    var guid = fontCategory.Attributes?["GUID"]?.Value 
                                                ?? fontCategory.Attributes?["Guid"]?.Value;
                                     if (!string.IsNullOrEmpty(guid) && !fontCategoryGuidsToKeep.Contains(guid))
                                     {
@@ -455,7 +455,7 @@ namespace Modes
                         var otherCategoriesToRemove = new List<XmlNode>();
                         foreach (XmlNode innerCategory in category.SelectNodes("Category"))
                         {
-                            string innerName = innerCategory.Attributes?["name"]?.Value;
+                            var innerName = innerCategory.Attributes?["name"]?.Value;
                             if (innerName != "Environment_FontsAndColors")
                             {
                                 otherCategoriesToRemove.Add(innerCategory);
@@ -476,7 +476,7 @@ namespace Modes
                             var modePropertyNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                             foreach (XmlNode prop in modeCategory.SelectNodes("PropertyValue"))
                             {
-                                string propName = prop.Attributes?["name"]?.Value;
+                                var propName = prop.Attributes?["name"]?.Value;
                                 if (!string.IsNullOrEmpty(propName))
                                 {
                                     modePropertyNames.Add(propName);
@@ -487,7 +487,7 @@ namespace Modes
                             var propsToRemove = new List<XmlNode>();
                             foreach (XmlNode prop in category.SelectNodes("PropertyValue"))
                             {
-                                string propName = prop.Attributes?["name"]?.Value;
+                                var propName = prop.Attributes?["name"]?.Value;
                                 if (!modePropertyNames.Contains(propName))
                                 {
                                     propsToRemove.Add(prop);
@@ -544,7 +544,7 @@ namespace Modes
                 {
                     foreach (XmlNode category in toolsOptionsCategoryNodes)
                     {
-                        string categoryName = category.Attributes?["name"]?.Value;
+                        var categoryName = category.Attributes?["name"]?.Value;
                         if (string.IsNullOrEmpty(categoryName))
                         {
                             continue;
@@ -556,7 +556,7 @@ namespace Modes
                         {
                             foreach (XmlNode subCategory in subCategoryNodes)
                             {
-                                string subCategoryName = subCategory.Attributes?["name"]?.Value;
+                                var subCategoryName = subCategory.Attributes?["name"]?.Value;
                                 if (!string.IsNullOrEmpty(subCategoryName))
                                 {
                                     // Format: "Environment/General" or "TextEditor/CSharp"
@@ -579,7 +579,7 @@ namespace Modes
                 {
                     foreach (XmlNode category in topLevelCategoryNodes)
                     {
-                        string categoryName = category.Attributes?["name"]?.Value;
+                        var categoryName = category.Attributes?["name"]?.Value;
                         if (!string.IsNullOrEmpty(categoryName))
                         {
                             categories.Add(categoryName);
@@ -622,7 +622,7 @@ namespace Modes
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            if (_activeMode.HasValue && _modeSettingsFiles.TryGetValue(_activeMode.Value, out string settingsPath))
+            if (_activeMode.HasValue && _modeSettingsFiles.TryGetValue(_activeMode.Value, out var settingsPath))
             {
                 if (File.Exists(settingsPath))
                 {

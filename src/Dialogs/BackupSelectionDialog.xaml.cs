@@ -58,7 +58,7 @@ namespace Modes
         {
             string[] sizes = { "B", "KB", "MB", "GB" };
             double len = bytes;
-            int order = 0;
+            var order = 0;
             while (len >= 1024 && order < sizes.Length - 1)
             {
                 order++;
@@ -119,7 +119,7 @@ namespace Modes
 
         private void BrowseFolderButton_Click(object sender, RoutedEventArgs e)
         {
-            string folder = SettingsBackupService.Instance.BackupFolder;
+            var folder = SettingsBackupService.Instance.BackupFolder;
             if (Directory.Exists(folder))
             {
                 Process.Start("explorer.exe", folder);

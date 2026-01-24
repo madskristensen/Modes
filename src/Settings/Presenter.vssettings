@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Presenter Mode: Increases font sizes for better visibility during presentations and screen sharing -->
+<!-- Note: Quick Info tooltips are disabled programmatically via DismissQuickInfoSource when this mode is active -->
 <UserSettings>
 	<ApplicationIdentity version="18.0"/>
 	<Category name="Environment_Group" RegisteredName="Environment_Group">

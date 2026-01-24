@@ -40,7 +40,7 @@ namespace Modes
                 // Perform async initialization outside the lock
                 if (!_isInitialized)
                 {
-                    bool initialized = await EnsureUIAsync();
+                    var initialized = await EnsureUIAsync();
                     _isInitialized = initialized;
                 }
             }
@@ -87,7 +87,7 @@ namespace Modes
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
             // Try to find the status bar panel multiple times with a delay
-            for (int i = 0; i < 10; i++)
+            for (var i = 0; i < 10; i++)
             {
                 _panel = FindChild<DockPanel>(Application.Current.MainWindow, "StatusBarPanel");
 
@@ -113,9 +113,9 @@ namespace Modes
             }
 
             T foundChild = null;
-            int childrenCount = VisualTreeHelper.GetChildrenCount(parent);
+            var childrenCount = VisualTreeHelper.GetChildrenCount(parent);
 
-            for (int i = 0; i < childrenCount; i++)
+            for (var i = 0; i < childrenCount; i++)
             {
                 DependencyObject child = VisualTreeHelper.GetChild(parent, i);
 

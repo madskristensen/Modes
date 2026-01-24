@@ -18,7 +18,7 @@ namespace Modes.Commands
             var dialog = new BackupSelectionDialog();
 
             // ShowModal properly parents to VS main window
-            bool? result = dialog.ShowModal();
+            var result = dialog.ShowModal();
 
             if (result == true && !string.IsNullOrEmpty(dialog.SelectedBackupPath))
             {

@@ -42,7 +42,7 @@ namespace Modes
 
         private SettingsBackupService()
         {
-            string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             _backupFolder = Path.Combine(appDataPath, Constants.Storage.AppDataFolderName, Constants.Backup.FolderName);
 
             // Ensure backup folder exists
@@ -208,9 +208,9 @@ namespace Modes
 
             try
             {
-                string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
-                string backupFileName = $"{Constants.Backup.FilePrefix}{timestamp}{Constants.Backup.FileExtension}";
-                string backupFilePath = Path.Combine(_backupFolder, backupFileName);
+                var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+                var backupFileName = $"{Constants.Backup.FilePrefix}{timestamp}{Constants.Backup.FileExtension}";
+                var backupFilePath = Path.Combine(_backupFolder, backupFileName);
 
                 DTE2 dte = await VS.GetServiceAsync<EnvDTE.DTE, DTE2>();
                 if (dte != null)
@@ -233,7 +233,7 @@ namespace Modes
             try
             {
                 FileInfo[] backups = GetBackupFiles();
-                for (int i = keepCount; i < backups.Length; i++)
+                for (var i = keepCount; i < backups.Length; i++)
                 {
                     backups[i].Delete();
                 }
@@ -257,8 +257,8 @@ namespace Modes
             // Use unchecked subtraction to handle TickCount wraparound correctly
             // When TickCount overflows (after ~24.9 days), unchecked arithmetic
             // still produces the correct elapsed time due to unsigned wraparound
-            uint currentTick = unchecked((uint)Environment.TickCount);
-            uint idleTime = unchecked(currentTick - lastInputInfo.dwTime);
+            var currentTick = unchecked((uint)Environment.TickCount);
+            var idleTime = unchecked(currentTick - lastInputInfo.dwTime);
             return idleTime >= Constants.Timers.RequiredIdleTimeMs;
         }
 
