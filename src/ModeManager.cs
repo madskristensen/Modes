@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
 using Community.VisualStudio.Toolkit;
-using EnvDTE80;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Imaging.Interop;
 using Microsoft.VisualStudio.Shell;
@@ -159,8 +158,7 @@ namespace Modes
         }
 
         /// <summary>
-        /// Clears active mode without restoring baseline settings.
-        /// Used when restoring from a backup file.
+        /// Clears active mode without restoring baseline settings. Used when restoring from a backup file.
         /// </summary>
         public async Task ClearActiveModeWithoutRestoreAsync()
         {
@@ -179,8 +177,8 @@ namespace Modes
         }
 
         /// <summary>
-        /// Exports current settings as the baseline backup, filtered to only include
-        /// the settings that the specified mode will change.
+        /// Exports current settings as the baseline backup, filtered to only include the settings that the specified
+        /// mode will change.
         /// </summary>
         private async Task ExportBaselineAsync(ModeType mode)
         {
@@ -195,18 +193,13 @@ namespace Modes
                     Directory.CreateDirectory(dir);
                 }
 
-                DTE2 dte = await VS.GetServiceAsync<EnvDTE.DTE, DTE2>();
-                if (dte == null)
-                {
-                    return;
-                }
-
                 // Load the mode's settings file to use as a template for filtering
                 var modeSettingsPath = _modeSettingsFiles[mode];
                 if (!File.Exists(modeSettingsPath))
                 {
                     // Fallback to full export
-                    dte.ExecuteCommand("Tools.ImportandExportSettings", $"/export:\"{_baselineBackupPath}\"");
+                    VS.Commands.ExecuteAsync("Tools.ImportandExportSettings", $"/export:\"{_baselineBackupPath}\"").FireAndForget();
+
                     return;
                 }
 
@@ -215,7 +208,7 @@ namespace Modes
 
                 // Export full settings to a temp file, then filter it
                 var tempExportPath = Path.Combine(dir, "temp_full_export.vssettings");
-                dte.ExecuteCommand("Tools.ImportandExportSettings", $"/export:\"{tempExportPath}\"");
+                VS.Commands.ExecuteAsync("Tools.ImportandExportSettings", $"/export:\"{tempExportPath}\"").FireAndForget();
 
                 // Wait for file to be written with retry logic instead of fixed delay
                 var fileReady = await WaitForFileAsync(tempExportPath, timeoutMs: 5000);
@@ -327,7 +320,7 @@ namespace Modes
                     foreach (XmlNode fontCategory in modeFontsCategory.SelectNodes(".//Category[@GUID or @Guid]"))
                     {
                         // Try both GUID (uppercase) and Guid (mixed case) attributes
-                        var guid = fontCategory.Attributes?["GUID"]?.Value 
+                        var guid = fontCategory.Attributes?["GUID"]?.Value
                                    ?? fontCategory.Attributes?["Guid"]?.Value;
                         if (!string.IsNullOrEmpty(guid))
                         {
@@ -436,7 +429,7 @@ namespace Modes
                                 // Categories are inside Categories/Category elements
                                 foreach (XmlNode fontCategory in fontsAndColors.SelectNodes(".//Category[@GUID or @Guid]"))
                                 {
-                                    var guid = fontCategory.Attributes?["GUID"]?.Value 
+                                    var guid = fontCategory.Attributes?["GUID"]?.Value
                                                ?? fontCategory.Attributes?["Guid"]?.Value;
                                     if (!string.IsNullOrEmpty(guid) && !fontCategoryGuidsToKeep.Contains(guid))
                                     {
@@ -521,8 +514,8 @@ namespace Modes
         }
 
         /// <summary>
-        /// Parses a .vssettings file and extracts the category paths for filtering exports.
-        /// Returns paths in the format "Category/SubCategory" as used by VS export command.
+        /// Parses a .vssettings file and extracts the category paths for filtering exports. Returns paths in the format
+        /// "Category/SubCategory" as used by VS export command.
         /// </summary>
         private List<string> GetCategoriesFromSettingsFile(string settingsFilePath)
         {
@@ -640,11 +633,7 @@ namespace Modes
 
             try
             {
-                DTE2 dte = await VS.GetServiceAsync<EnvDTE.DTE, DTE2>();
-                if (dte != null)
-                {
-                    dte.ExecuteCommand("Tools.ImportandExportSettings", $"/import:\"{settingsPath}\"");
-                }
+                await VS.Commands.ExecuteAsync("Tools.ImportandExportSettings", $"/import:\"{settingsPath}\"");
             }
             catch (Exception ex)
             {
@@ -661,23 +650,19 @@ namespace Modes
 
             try
             {
-                DTE2 dte = await VS.GetServiceAsync<EnvDTE.DTE, DTE2>();
-                if (dte == null) return;
-
                 switch (mode)
                 {
                     case ModeType.Focus:
                         if (enabling)
                         {
-                            // Auto-hide all tool windows for distraction-free coding
-                            try
-                            {
-                                dte.ExecuteCommand("Window.AutoHideAll");
-                            }
-                            catch
-                            {
-                                // Command may not be available in all VS configurations
-                            }
+                            VS.Commands.ExecuteAsync("Window.AutoHideAll").FireAndForget();
+                        }
+                        break;
+
+                    case ModeType.LowPower:
+                        if (enabling)
+                        {
+                            VS.Commands.ExecuteAsync("Test.LiveUnitTesting.Stop").FireAndForget();
                         }
                         break;
                 }

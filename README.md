@@ -23,6 +23,12 @@ Manually toggling these settings every time your context changes is frustrating 
 
 **Modes** provides four carefully curated configurations that instantly transform Visual Studio for specific scenarios. Enable a mode with one click, and your original settings are automatically backed up. Disable it, and everything is restored exactly as it was.
 
+This extension addresses several popular feature requests from the Visual Studio Developer Community:
+
+- [Focus Mode](https://developercommunity.visualstudio.com/t/Focus-Mode-for-Visual-Studio/1461172)
+- [Presentation Mode](https://developercommunity.visualstudio.com/t/Visual-Studio-Presentation-Mode/842920)
+- [High battery drain](https://developercommunity.visualstudio.com/t/High-battery-drain/116281)
+
 ## Modes
 
 - **🔋 Low Power** - Maximize battery life on laptops
@@ -85,6 +91,7 @@ Dramatically reduces CPU, GPU, and disk usage by disabling background work and v
 | Hardware Acceleration       | Disabled       | Reduces GPU power draw                  |
 | Highlight References        | Disabled       | Reduces typing delay                    |
 | Inline Hints                | Disabled       | Reduces rendering overhead              |
+| Live Unit Testing           | Stopped        | Eliminates continuous test execution    |
 
 ### 🔍 Focus Mode
 

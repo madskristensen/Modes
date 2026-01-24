@@ -3,7 +3,6 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Community.VisualStudio.Toolkit;
-using EnvDTE80;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 
@@ -94,12 +93,8 @@ namespace Modes
                     return;
                 }
 
-                DTE2 dte = await VS.GetServiceAsync<EnvDTE.DTE, DTE2>();
-                if (dte != null)
-                {
-                    dte.ExecuteCommand("Tools.ImportandExportSettings", $"/import:\"{backupFilePath}\"");
-                    await VS.StatusBar.ShowMessageAsync($"Restored settings from {Path.GetFileName(backupFilePath)}");
-                }
+                await VS.Commands.ExecuteAsync("Tools.ImportandExportSettings", $"/import:\"{backupFilePath}\"");
+                await VS.StatusBar.ShowMessageAsync($"Restored settings from {Path.GetFileName(backupFilePath)}");
             }
             catch (Exception ex)
             {
@@ -212,15 +207,11 @@ namespace Modes
                 var backupFileName = $"{Constants.Backup.FilePrefix}{timestamp}{Constants.Backup.FileExtension}";
                 var backupFilePath = Path.Combine(_backupFolder, backupFileName);
 
-                DTE2 dte = await VS.GetServiceAsync<EnvDTE.DTE, DTE2>();
-                if (dte != null)
-                {
-                    dte.ExecuteCommand("Tools.ImportandExportSettings", $"/export:\"{backupFilePath}\"");
-                    _lastBackupTime = DateTime.Now;
+                await VS.Commands.ExecuteAsync("Tools.ImportandExportSettings", $"/export:\"{backupFilePath}\"");
+                _lastBackupTime = DateTime.Now;
 
-                    // Clean up old backups
-                    CleanupOldBackups(Constants.Backup.MaxBackupCount);
-                }
+                // Clean up old backups
+                CleanupOldBackups(Constants.Backup.MaxBackupCount);
             }
             catch (Exception ex)
             {
