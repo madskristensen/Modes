@@ -27,8 +27,12 @@
       <Group guid="Modes" id="ModeCommandsGroup" priority="0x0100">
         <Parent guid="Modes" id="ModesSubMenu"/>
       </Group>
-      <!-- Separator group for Reset command -->
+      <!-- Separator group for Disable and Restore commands -->
       <Group guid="Modes" id="ResetCommandsGroup" priority="0x0200">
+        <Parent guid="Modes" id="ModesSubMenu"/>
+      </Group>
+      <!-- Separator group for Settings command at bottom -->
+      <Group guid="Modes" id="SettingsCommandsGroup" priority="0x0300">
         <Parent guid="Modes" id="ModesSubMenu"/>
       </Group>
     </Groups>
@@ -78,20 +82,31 @@
         </Strings>
       </Button>
 
+      <!-- Disable Active Mode -->
+      <Button guid="Modes" id="DisableModeCommand" priority="0x0100" type="Button">
+        <Parent guid="Modes" id="ResetCommandsGroup" />
+        <Icon guid="ImageCatalogGuid" id="Cancel" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Disable active mode</ButtonText>
+          <LocCanonicalName>.Modes.DisableMode</LocCanonicalName>
+        </Strings>
+      </Button>
+
       <!-- Reset Settings -->
-      <Button guid="Modes" id="ResetSettingsCommand" priority="0x0100" type="Button">
+      <Button guid="Modes" id="ResetSettingsCommand" priority="0x0200" type="Button">
         <Parent guid="Modes" id="ResetCommandsGroup" />
         <Icon guid="ImageCatalogGuid" id="History" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
-          <ButtonText>Restore Settings...</ButtonText>
+          <ButtonText>Restore historic settings...</ButtonText>
           <LocCanonicalName>.Modes.RestoreSettings</LocCanonicalName>
         </Strings>
       </Button>
 
       <!-- Settings -->
-      <Button guid="Modes" id="SettingsCommand" priority="0x0200" type="Button">
-        <Parent guid="Modes" id="ResetCommandsGroup" />
+      <Button guid="Modes" id="SettingsCommand" priority="0x0100" type="Button">
+        <Parent guid="Modes" id="SettingsCommandsGroup" />
         <Icon guid="ImageCatalogGuid" id="Settings" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <Strings>
@@ -102,16 +117,27 @@
     </Buttons>
   </Commands>
 
+  <KeyBindings>
+    <KeyBinding guid="Modes" id="LowPowerCommand" editor="guidVSStd97" key1="I" mod1="Alt Shift" />
+    <KeyBinding guid="Modes" id="FocusCommand" editor="guidVSStd97" key1="J" mod1="Alt Shift" />
+    <KeyBinding guid="Modes" id="PerformanceCommand" editor="guidVSStd97" key1="Y" mod1="Alt Shift" />
+    <KeyBinding guid="Modes" id="PresenterCommand" editor="guidVSStd97" key1="K" mod1="Alt Shift" />
+    <!-- Shift+Alt+0 for Disable active mode -->
+    <KeyBinding guid="Modes" id="DisableModeCommand" editor="guidVSStd97" key1="0" mod1="Alt Shift" />
+  </KeyBindings>
+
   <Symbols>
     <GuidSymbol name="Modes" value="{7c697c09-64b1-4dc2-ba0b-955215206732}">
       <IDSymbol name="ModesMenuGroup" value="0x0001" />
       <IDSymbol name="ModesSubMenu" value="0x0002" />
       <IDSymbol name="ModeCommandsGroup" value="0x0003" />
       <IDSymbol name="ResetCommandsGroup" value="0x0004" />
+      <IDSymbol name="SettingsCommandsGroup" value="0x0005" />
       <IDSymbol name="LowPowerCommand" value="0x0100" />
       <IDSymbol name="FocusCommand" value="0x0101" />
       <IDSymbol name="PerformanceCommand" value="0x0102" />
       <IDSymbol name="PresenterCommand" value="0x0103" />
+      <IDSymbol name="DisableModeCommand" value="0x0106" />
       <IDSymbol name="ResetSettingsCommand" value="0x0104" />
       <IDSymbol name="SettingsCommand" value="0x0105" />
     </GuidSymbol>

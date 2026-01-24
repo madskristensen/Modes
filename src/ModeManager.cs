@@ -198,8 +198,7 @@ namespace Modes
                 if (!File.Exists(modeSettingsPath))
                 {
                     // Fallback to full export
-                    VS.Commands.ExecuteAsync("Tools.ImportandExportSettings", $"/export:\"{_baselineBackupPath}\"").FireAndForget();
-
+                    await VS.Commands.ExecuteAsync("Tools.ImportandExportSettings", $"/export:\"{_baselineBackupPath}\"");
                     return;
                 }
 
@@ -208,7 +207,7 @@ namespace Modes
 
                 // Export full settings to a temp file, then filter it
                 var tempExportPath = Path.Combine(dir, "temp_full_export.vssettings");
-                VS.Commands.ExecuteAsync("Tools.ImportandExportSettings", $"/export:\"{tempExportPath}\"").FireAndForget();
+                await VS.Commands.ExecuteAsync("Tools.ImportandExportSettings", $"/export:\"{tempExportPath}\"");
 
                 // Wait for file to be written with retry logic instead of fixed delay
                 var fileReady = await WaitForFileAsync(tempExportPath, timeoutMs: 5000);

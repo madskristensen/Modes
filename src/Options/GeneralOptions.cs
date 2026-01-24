@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Community.VisualStudio.Toolkit;
-using Microsoft.VisualStudio.Shell;
 
 namespace Modes
 {
@@ -18,6 +17,12 @@ namespace Modes
         [Description("Automatically enable Low Power mode when Windows enters power saver/battery saver mode.")]
         [DefaultValue(true)]
         public bool AutoEnableLowPowerMode { get; set; } = true;
+
+        [Category("Power Management")]
+        [DisplayName("Auto-switch on power source change")]
+        [Description("Automatically enable Low Power mode when unplugging from AC power, and disable it when plugging back in.")]
+        [DefaultValue(false)]
+        public bool AutoSwitchOnPowerSourceChange { get; set; } = false;
 
         [Category("Backup")]
         [DisplayName("Auto-backup settings")]

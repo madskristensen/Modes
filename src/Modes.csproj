@@ -39,15 +39,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Commands\DisableModeCommand.cs" />
     <Compile Include="Commands\PresenterCommand.cs" />
     <Compile Include="Commands\ResetSettingsCommand.cs" />
     <Compile Include="Commands\SettingsCommand.cs" />
-    <Compile Include="Commands\ZenCommand.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Dialogs\BackupSelectionDialog.xaml.cs">
       <DependentUpon>BackupSelectionDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Options\GeneralOptions.cs" />
+    <Compile Include="PowerMonitor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Commands\BaseModeCommand.cs" />
     <Compile Include="Commands\LowPowerCommand.cs" />
@@ -127,6 +128,7 @@
     <PackageReference Include="Community.VisualStudio.Toolkit.17" Version="17.0.549" ExcludeAssets="Runtime">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.22621.755" />
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.14.2120">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>

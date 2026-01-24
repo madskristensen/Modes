@@ -39,9 +39,10 @@ This extension addresses several popular feature requests from the Visual Studio
 ## Features
 
 - **One-click toggle** from Tools > Modes menu
+- **Keyboard shortcuts** - Quick access to all modes
 - **Status bar indicator** - see active mode at a glance, click to disable
 - **Automatic baseline backup** - your settings are always safe
-- **Auto Low Power mode** - activates when Windows enters battery saver
+- **Auto Low Power mode** - activates when Windows enters Energy Saver or on battery
 - **Settings backup service** - periodic backups of your VS settings
 
 ## Usage
@@ -49,6 +50,16 @@ This extension addresses several popular feature requests from the Visual Studio
 1. Open **Tools > Modes**
 2. Click a mode to enable it
 3. Click again (or the status bar icon) to disable and restore your settings
+
+### Keyboard Shortcuts
+
+| Shortcut      | Command             |
+| ------------- | ------------------- |
+| `Shift+Alt+I` | Low Power mode      |
+| `Shift+Alt+J` | Focus mode          |
+| `Shift+Alt+Y` | Performance mode    |
+| `Shift+Alt+K` | Presenter mode      |
+| `Shift+Alt+0` | Disable active mode |
 
 ![Statusbar](art/statusbar.png)
 
@@ -58,11 +69,12 @@ Configure behavior via **Tools > Options > Modes > General**:
 
 ![Settings](art/settings.png)
 
-| Option                     | Default | Description                                             |
-| -------------------------- | ------- | ------------------------------------------------------- |
-| Auto-backup settings       | true    | Automatically back up Visual Studio settings when idle  |
-| Auto-enable Low Power mode | true    | Enable Low Power mode when Windows enters battery saver |
-| Backup interval (hours)    | 48      | Minimum time between automatic backups                  |
+| Option                             | Default | Description                                            |
+| ---------------------------------- | ------- | ------------------------------------------------------ |
+| Auto-backup settings               | true    | Automatically back up Visual Studio settings when idle |
+| Auto-enable Low Power mode         | true    | Enable Low Power mode when Windows enters Energy Saver |
+| Auto-switch on power source change | false   | Enable Low Power mode when unplugging from AC power    |
+| Backup interval (hours)            | 48      | Minimum time between automatic backups                 |
 
 ## Restore Settings
 
@@ -76,7 +88,7 @@ Accidentally changed something? Use **Tools > Modes > Restore Settings...** to r
 
 *Perfect for: Working on battery, large solutions, limited hardware*
 
-Dramatically reduces CPU, GPU, and disk usage by disabling background work and visual effects. Automatically activates when Windows enters battery saver mode.
+Dramatically reduces CPU, GPU, and disk usage by disabling background work and visual effects. Automatically activates when Windows enters Energy Saver mode (configurable).
 
 | Setting                     | Value          | Why                                     |
 | --------------------------- | -------------- | --------------------------------------- |
@@ -101,13 +113,13 @@ Creates a minimal, distraction-free environment by hiding UI clutter and reducin
 
 | Setting                | Value       | Why                            |
 | ---------------------- | ----------- | ------------------------------ |
-| Tool Windows           | Auto-hidden | Maximum code visibility        |
-| CodeLens               | Disabled    | Cleaner editor                 |
-| Inline Hints           | Disabled    | Less visual noise              |
 | Code Fading            | Disabled    | No distracting dimming effects |
+| CodeLens               | Disabled    | Cleaner editor                 |
 | Current Line Highlight | Disabled    | Cleaner editor appearance      |
+| Inline Hints           | Disabled    | Less visual noise              |
 | Navigation Bar         | Hidden      | More vertical space            |
 | Selection Matches      | Disabled    | No distracting highlights      |
+| Tool Windows           | Auto-hidden | Maximum code visibility        |
 | Warning Messages       | Disabled    | Fewer interruptions            |
 
 ### 🚀 Performance Mode  
