@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Community.VisualStudio.Toolkit;
 using Microsoft.VisualStudio.Shell;
 using Windows.System.Power;
 using Task = System.Threading.Tasks.Task;
@@ -77,7 +76,7 @@ namespace Modes
                 ModeManager manager = ModeManager.Instance;
 
                 // Determine if we should be in low power mode based on settings
-                bool shouldEnableLowPower = ShouldEnableLowPowerMode(options);
+                var shouldEnableLowPower = ShouldEnableLowPowerMode(options);
 
                 if (shouldEnableLowPower && !manager.IsModeActive(ModeType.LowPower))
                 {
@@ -124,6 +123,15 @@ namespace Modes
 
             _disposed = true;
             PowerManager.EnergySaverStatusChanged -= OnPowerStatusChanged;
+
+            // Clear singleton to allow re-initialization if package is reloaded
+            lock (_lock)
+            {
+                if (_instance == this)
+                {
+                    _instance = null;
+                }
+            }
         }
     }
 }

@@ -267,8 +267,18 @@ namespace Modes
         {
             if (!_disposed)
             {
-                _idleCheckTimer?.Dispose();
+                // Set disposed flag first to prevent timer callback from running
                 _disposed = true;
+                _idleCheckTimer?.Dispose();
+
+                // Clear singleton to allow re-initialization if package is reloaded
+                lock (_lock)
+                {
+                    if (_instance == this)
+                    {
+                        _instance = null;
+                    }
+                }
             }
         }
     }

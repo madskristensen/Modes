@@ -17,7 +17,7 @@ namespace Modes
     /// <summary>
     /// Manages mode states, settings application, and status bar indicators.
     /// </summary>
-    internal sealed class ModeManager
+    internal sealed class ModeManager : IDisposable
     {
         private static ModeManager _instance;
         private static readonly object _lock = new object();
@@ -26,6 +26,7 @@ namespace Modes
         private FrameworkElement _statusBarIndicator;
         private readonly Dictionary<ModeType, string> _modeSettingsFiles;
         private readonly string _baselineBackupPath;
+        private bool _disposed;
 
         /// <summary>
         /// Gets the singleton instance.
@@ -378,12 +379,22 @@ namespace Modes
                 {
                     statusbar.SetText(message);
 
-                    // Clear after a few seconds
-                    _ = Task.Delay(3000).ContinueWith(async _ =>
+                    // Clear after a few seconds using JoinableTaskFactory for proper VS thread handling
+                    // This avoids memory leaks from Task.ContinueWith capturing variables
+                    ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
                     {
+                        await Task.Delay(3000);
                         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-                        statusbar.SetText(string.Empty);
-                    }, TaskScheduler.Default);
+                        try
+                        {
+                            IVsStatusbar sb = await VS.Services.GetStatusBarAsync();
+                            sb?.SetText(string.Empty);
+                        }
+                        catch
+                        {
+                            // Ignore errors when clearing status bar (VS may be shutting down)
+                        }
+                    }).FireAndForget();
                 }
             }
             catch (Exception ex)
@@ -471,6 +482,28 @@ namespace Modes
             };
 
             return indicator;
+        }
+
+        /// <summary>
+        /// Disposes resources and clears the singleton instance.
+        /// </summary>
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+
+            // Clear singleton to allow re-initialization if package is reloaded
+            lock (_lock)
+            {
+                if (_instance == this)
+                {
+                    _instance = null;
+                }
+            }
         }
     }
 }

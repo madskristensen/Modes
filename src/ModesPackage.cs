@@ -38,13 +38,15 @@ namespace Modes
     {
         private SettingsBackupService _backupService;
         private PowerMonitor _powerMonitor;
+        private ModeManager _modeManager;
 
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             await this.RegisterCommandsAsync();
 
             // Initialize the ModeManager to restore persisted mode states
-            await ModeManager.Instance.InitializeAsync();
+            _modeManager = ModeManager.Instance;
+            await _modeManager.InitializeAsync();
 
             // Initialize the backup service
             _backupService = SettingsBackupService.Instance;
@@ -59,6 +61,7 @@ namespace Modes
             {
                 _powerMonitor?.Dispose();
                 _backupService?.Dispose();
+                _modeManager?.Dispose();
             }
 
             base.Dispose(disposing);
