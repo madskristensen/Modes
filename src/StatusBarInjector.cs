@@ -1,10 +1,8 @@
-using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.PlatformUI;
 using Task = System.Threading.Tasks.Task;
 
 namespace Modes
@@ -16,8 +14,7 @@ namespace Modes
     internal static class StatusBarInjector
     {
         private static Panel _panel;
-        private static volatile bool _isInitialized;
-        private static readonly object _initLock = new object();
+        private static bool _isInitialized;
 
         /// <summary>
         /// Injects a FrameworkElement into the status bar (docked to the right).
@@ -28,21 +25,7 @@ namespace Modes
 
             if (!_isInitialized)
             {
-                lock (_initLock)
-                {
-                    if (!_isInitialized)
-                    {
-                        // Note: EnsureUIAsync must be called outside the lock to avoid deadlock
-                        // We use double-check locking pattern with volatile flag
-                    }
-                }
-
-                // Perform async initialization outside the lock
-                if (!_isInitialized)
-                {
-                    var initialized = await EnsureUIAsync();
-                    _isInitialized = initialized;
-                }
+                _isInitialized = await EnsureUIAsync();
             }
 
             if (_panel == null)
@@ -119,8 +102,7 @@ namespace Modes
             {
                 DependencyObject child = VisualTreeHelper.GetChild(parent, i);
 
-                var typedChild = child as T;
-                if (typedChild == null)
+                if (!(child is T typedChild))
                 {
                     foundChild = FindChild<T>(child, childName);
 

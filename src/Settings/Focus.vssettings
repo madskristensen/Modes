@@ -87,5 +87,7 @@
 		<PropertyValue name="Adornments/HighlightCurrentLine/Enable">false</PropertyValue>
 		<!-- Disable selection matching highlights -->
 		<PropertyValue name="TextView/SelectionMatches">false</PropertyValue>
+		<!-- Disable sticky scroll - can be distracting during focused coding -->
+		<PropertyValue name="EnableStickyScroll">false</PropertyValue>
 	</Category>
 </UserSettings>

@@ -113,4 +113,8 @@
 	<Category name="Environment_ExtensionManager" Category="{539391d7-9414-4715-b033-8669db0abee1}" Package="{5dd582d8-4665-49e4-b74d-d376fb4ce60b}" RegisteredName="Environment_ExtensionManager" PackageName="ExtensionManagementPackage">
 		<PropertyValue name="AutomaticallyCheckForUpdates2">False</PropertyValue>
 	</Category>
+	<!-- Disable Git avatar downloads to save network/CPU -->
+	<Category name="Git Version Control_GitSccProvider" Category="{33a4cda9-b7a6-3f4f-9e1f-e4d71f0a9cfa}" Package="{7fe30a77-37f9-4cf2-83dd-96b207028e1b}" RegisteredName="Git Version Control_GitSccProvider" PackageName="SccProviderPackage">
+		<PropertyValue name="AvatarsEnableThirdPartyImages">0</PropertyValue>
+	</Category>
 </UserSettings>

@@ -60,6 +60,7 @@
     <Compile Include="QuickInfo\DismissQuickInfoSource.cs" />
     <Compile Include="QuickInfo\DismissQuickInfoSourceProvider.cs" />
     <Compile Include="SettingsBackupService.cs" />
+    <Compile Include="SettingsFilter.cs" />
     <Compile Include="StatusBarInjector.cs" />
     <Compile Include="source.extension.cs">
       <AutoGen>True</AutoGen>

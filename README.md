@@ -90,20 +90,26 @@ Accidentally changed something? Use **Tools > Modes > Restore Settings...** to r
 
 Dramatically reduces CPU, GPU, and disk usage by disabling background work and visual effects. Automatically activates when Windows enters Energy Saver mode (configurable).
 
-| Setting                     | Value          | Why                                     |
-| --------------------------- | -------------- | --------------------------------------- |
-| Animations                  | Disabled       | Eliminates unnecessary rendering        |
-| Auto-downloads              | Disabled       | No background network activity          |
-| Background Analysis Scope   | Open documents | Stop analyzing files you're not editing |
-| C# Closed File Diagnostics  | Disabled       | No CPU spent on closed files            |
-| CodeLens                    | Disabled       | Removes constant background queries     |
-| Concurrent Builds           | 1              | Reduces CPU/thermal load                |
-| Extension Auto-Update Check | Disabled       | No background network/CPU usage         |
-| File Change Detection       | Disabled       | Reduces disk I/O polling                |
-| Hardware Acceleration       | Disabled       | Reduces GPU power draw                  |
-| Highlight References        | Disabled       | Reduces typing delay                    |
-| Inline Hints                | Disabled       | Reduces rendering overhead              |
-| Live Unit Testing           | Stopped        | Eliminates continuous test execution    |
+| Setting                       | Value          | Why                                     |
+| ----------------------------- | -------------- | --------------------------------------- |
+| Animations                    | Disabled       | Eliminates unnecessary rendering        |
+| Auto-downloads                | Disabled       | No background network activity          |
+| Background Analysis Scope     | Open documents | Stop analyzing files you're not editing |
+| C# Closed File Diagnostics    | Disabled       | No CPU spent on closed files            |
+| CodeLens                      | Disabled       | Removes constant background queries     |
+| Concurrent Builds             | 1              | Reduces CPU/thermal load                |
+| Document Restore              | Disabled       | Faster solution open                    |
+| Extension Auto-Update Check   | Disabled       | No background network/CPU usage         |
+| File Change Detection         | Disabled       | Reduces disk I/O polling                |
+| Git Avatar Downloads          | Disabled       | No background network activity          |
+| Hardware Acceleration         | Disabled       | Reduces GPU power draw                  |
+| Highlight References          | Disabled       | Reduces typing delay                    |
+| Inline Hints                  | Disabled       | Reduces rendering overhead              |
+| Live Unit Testing             | Stopped        | Eliminates continuous test execution    |
+| NuGet Package Suggestions     | Disabled       | No background network/CPU usage         |
+| Scrollbar Annotations         | Disabled       | Reduces rendering overhead              |
+| Solution Explorer State       | Not restored   | Faster solution open                    |
+| Track Active Item             | Disabled       | Reduces UI thread work                  |
 
 ### 🔍 Focus Mode
 
@@ -111,16 +117,22 @@ Dramatically reduces CPU, GPU, and disk usage by disabling background work and v
 
 Creates a minimal, distraction-free environment by hiding UI clutter and reducing visual noise.
 
-| Setting                | Value       | Why                            |
-| ---------------------- | ----------- | ------------------------------ |
-| Code Fading            | Disabled    | No distracting dimming effects |
-| CodeLens               | Disabled    | Cleaner editor                 |
-| Current Line Highlight | Disabled    | Cleaner editor appearance      |
-| Inline Hints           | Disabled    | Less visual noise              |
-| Navigation Bar         | Hidden      | More vertical space            |
-| Selection Matches      | Disabled    | No distracting highlights      |
-| Tool Windows           | Auto-hidden | Maximum code visibility        |
-| Warning Messages       | Disabled    | Fewer interruptions            |
+| Setting                | Value       | Why                              |
+| ---------------------- | ----------- | -------------------------------- |
+| Animations             | Disabled    | Reduces visual noise             |
+| Code Fading            | Disabled    | No distracting dimming effects   |
+| CodeLens               | Disabled    | Cleaner editor                   |
+| Current Line Highlight | Disabled    | Cleaner editor appearance        |
+| Inline Hints           | Disabled    | Less visual noise                |
+| Line Separators        | Disabled    | Cleaner code appearance          |
+| Navigation Bar         | Hidden      | More vertical space              |
+| Output Window on Build | Disabled    | No window popping up             |
+| Scrollbar Annotations  | Disabled    | Cleaner scrollbar                |
+| Selection Matches      | Disabled    | No distracting highlights        |
+| Sticky Scroll          | Disabled    | Reduces visual clutter           |
+| Task List After Build  | Disabled    | No interruptions                 |
+| Tool Windows           | Auto-hidden | Maximum code visibility          |
+| Warning Messages       | Disabled    | Fewer interruptions              |
 
 ### 🚀 Performance Mode  
 
@@ -130,10 +142,16 @@ Disables features known to cause UI hangs, typing delays, and slow solution load
 
 | Setting                          | Value    | Why                                     |
 | -------------------------------- | -------- | --------------------------------------- |
+| Animations                       | Disabled | Reduces UI overhead                     |
+| Closed File Diagnostics          | Disabled | Major performance impact                |
 | Concurrent Builds                | 22       | Maximum parallel compilation            |
 | Document Restore                 | Disabled | Faster solution open                    |
+| Inline Hints                     | Disabled | Reduces typing delay                    |
+| NuGet Package Suggestions        | Disabled | Reduces network/CPU overhead            |
 | Output Window on Build           | Disabled | No UI thread blocking                   |
-| Skip Analyzers (implicit builds) | true     | Faster hot reload and background builds |
+| Scrollbar Annotations            | Disabled | Reduces rendering overhead              |
+| Skip Analyzers (implicit builds) | Enabled  | Faster hot reload and background builds |
+| Solution Explorer State          | Not restored | Faster solution open                 |
 | Track Active Item                | Disabled | Reduces UI thread work                  |
 
 ### 🎤 Presenter Mode
@@ -142,17 +160,17 @@ Disables features known to cause UI hangs, typing delays, and slow solution load
 
 Increases all font sizes so your audience can actually read your code, and disables hover tooltips that can obscure code during demos.
 
-| Setting                 | Value              |
-| ----------------------- | ------------------ |
-| Command Window          | Cascadia Code 14pt |
-| Environment Font        | Segoe UI 11pt      |
-| Immediate Window        | Cascadia Code 14pt |
-| IntelliSense/Completion | Cascadia Code 14pt |
-| Output Window           | Cascadia Code 14pt |
-| Printer Font            | Cascadia Code 16pt |
-| Quick Info on Hover     | Disabled           |
-| Text Editor Font        | Cascadia Code 16pt |
-| Watch/Locals Windows    | Cascadia Code 14pt |
+| Setting                 | Value              | Why                              |
+| ----------------------- | ------------------ | -------------------------------- |
+| Command Window          | Cascadia Code 14pt | Readable command input           |
+| Environment Font        | Segoe UI 11pt      | Larger UI elements               |
+| Immediate Window        | Cascadia Code 14pt | Readable debugger input          |
+| IntelliSense/Completion | Cascadia Code 14pt | Readable autocomplete            |
+| Output Window           | Cascadia Code 14pt | Readable build output            |
+| Printer Font            | Cascadia Code 16pt | Match editor for printing        |
+| Quick Info Tooltips     | Disabled           | No tooltips obscuring code       |
+| Text Editor Font        | Cascadia Code 16pt | Large, readable code             |
+| Watch/Locals Windows    | Cascadia Code 14pt | Readable variable inspection     |
 
 ## How It Works
 

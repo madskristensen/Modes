@@ -26,6 +26,7 @@
       <!-- Group containing the mode toggle commands inside the Modes submenu -->
       <Group guid="Modes" id="ModeCommandsGroup" priority="0x0100">
         <Parent guid="Modes" id="ModesSubMenu"/>
+        <GroupFlag>Dynamic</GroupFlag>
       </Group>
       <!-- Separator group for Disable and Restore commands -->
       <Group guid="Modes" id="ResetCommandsGroup" priority="0x0200">
