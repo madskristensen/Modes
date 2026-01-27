@@ -36,4 +36,7 @@
 			</FontsAndColors>
 		</Category>
 	</Category>
+	<Category name="Text Editor_General" Category="{c178af61-531a-46f0-bd57-102d9e42c711}" Package="{e269b994-ef71-4ce0-8bcd-581c217372e8}" RegisteredName="Text Editor_General" PackageName="Microsoft.VisualStudio.Editor.Implementation.EditorPackage">
+		<PropertyValue name="Adornments/HighlightCurrentLine/Enable">true</PropertyValue>
+	</Category>
 </UserSettings>
