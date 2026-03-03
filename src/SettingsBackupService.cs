@@ -18,6 +18,7 @@ namespace Modes
 
         private readonly string _backupFolder;
         private readonly Timer _idleCheckTimer;
+        private readonly SemaphoreSlim _backupSemaphore;
         private DateTime _lastBackupTime = DateTime.MinValue;
         private bool _disposed;
 
@@ -52,6 +53,8 @@ namespace Modes
 
             // Load last backup time from most recent backup file
             LoadLastBackupTime();
+
+            _backupSemaphore = new SemaphoreSlim(1, 1);
 
             // Start idle check timer
             _idleCheckTimer = new Timer(OnIdleCheckTimer, null, Constants.Timers.IdleCheckIntervalMs, Constants.Timers.IdleCheckIntervalMs);
@@ -187,8 +190,8 @@ namespace Modes
                         return;
                     }
 
-                    // Perform backup
-                    await CreateBackupAsync();
+                    // Perform backup (skip this timer cycle if another backup is already running)
+                    await CreateBackupAsync(skipIfAlreadyRunning: true);
                 }
                 catch (Exception ex)
                 {
@@ -197,12 +200,28 @@ namespace Modes
             }).FireAndForget();
         }
 
-        private async Task CreateBackupAsync()
+        private async Task CreateBackupAsync(bool skipIfAlreadyRunning = false)
         {
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            bool lockTaken;
+            if (skipIfAlreadyRunning)
+            {
+                lockTaken = await _backupSemaphore.WaitAsync(0);
+            }
+            else
+            {
+                await _backupSemaphore.WaitAsync();
+                lockTaken = true;
+            }
+
+            if (!lockTaken)
+            {
+                return;
+            }
 
             try
             {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
                 var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
                 var backupFileName = $"{Constants.Backup.FilePrefix}{timestamp}{Constants.Backup.FileExtension}";
                 var backupFilePath = Path.Combine(_backupFolder, backupFileName);
@@ -216,6 +235,10 @@ namespace Modes
             catch (Exception ex)
             {
                 await ex.LogAsync();
+            }
+            finally
+            {
+                _backupSemaphore.Release();
             }
         }
 
@@ -270,6 +293,7 @@ namespace Modes
                 // Set disposed flag first to prevent timer callback from running
                 _disposed = true;
                 _idleCheckTimer?.Dispose();
+                _backupSemaphore?.Dispose();
 
                 // Clear singleton to allow re-initialization if package is reloaded
                 lock (_lock)

@@ -122,6 +122,7 @@ namespace Modes
                     await ShowStatusBarMessageAsync($"Disabling {mode} mode...");
                     _activeMode = null;
                     await RestoreBaselineAsync();
+                    await ExecuteModeCommandsAsync(mode, false);
                     await ShowStatusBarMessageAsync($"Disabled {mode} mode - restored baseline settings");
                 }
                 else
@@ -131,6 +132,9 @@ namespace Modes
 
                     if (_activeMode.HasValue)
                     {
+                        var previousMode = _activeMode.Value;
+                        await ExecuteModeCommandsAsync(previousMode, false);
+
                         // Switching from one mode to another - restore baseline first
                         await RestoreBaselineAsync();
                     }
@@ -183,11 +187,8 @@ namespace Modes
         /// </summary>
         private async Task ExportBaselineAsync(ModeType mode)
         {
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
             try
             {
-                // Ensure the directory exists
                 var dir = Path.GetDirectoryName(_baselineBackupPath);
                 if (!Directory.Exists(dir))
                 {
@@ -198,16 +199,23 @@ namespace Modes
                 var modeSettingsPath = _modeSettingsFiles[mode];
                 if (!File.Exists(modeSettingsPath))
                 {
+                    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
                     // Fallback to full export
                     await VS.Commands.ExecuteAsync("Tools.ImportandExportSettings", $"/export:\"{_baselineBackupPath}\"");
                     return;
                 }
 
-                var modeSettingsDoc = new XmlDocument();
-                modeSettingsDoc.Load(modeSettingsPath);
+                var modeSettingsDoc = await Task.Run(() =>
+                {
+                    var doc = new XmlDocument();
+                    doc.Load(modeSettingsPath);
+                    return doc;
+                });
 
                 // Export full settings to a temp file, then filter it
                 var tempExportPath = Path.Combine(dir, "temp_full_export.vssettings");
+
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
                 await VS.Commands.ExecuteAsync("Tools.ImportandExportSettings", $"/export:\"{tempExportPath}\"");
 
                 // Wait for file to be written with retry logic instead of fixed delay
@@ -219,8 +227,15 @@ namespace Modes
                 }
 
                 // Filter the exported settings to match the mode's settings structure
-                SettingsFilter.FilterSettingsFile(tempExportPath, _baselineBackupPath, modeSettingsDoc);
-                File.Delete(tempExportPath);
+                await Task.Run(() =>
+                {
+                    SettingsFilter.FilterSettingsFile(tempExportPath, _baselineBackupPath, modeSettingsDoc);
+
+                    if (File.Exists(tempExportPath))
+                    {
+                        File.Delete(tempExportPath);
+                    }
+                });
             }
             catch (Exception ex)
             {
@@ -254,7 +269,7 @@ namespace Modes
                     // File exists but is locked, continue waiting
                 }
 
-                await Task.Delay(checkIntervalMs);
+                await Task.Delay(checkIntervalMs).ConfigureAwait(false);
                 elapsed += checkIntervalMs;
             }
 
@@ -315,7 +330,7 @@ namespace Modes
         }
 
         /// <summary>
-        /// Executes mode-specific commands (e.g., Focus mode hides tool windows).
+        /// Executes mode-specific commands during mode transitions.
         /// </summary>
         private async Task ExecuteModeCommandsAsync(ModeType mode, bool enabling)
         {
