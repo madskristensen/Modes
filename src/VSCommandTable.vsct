@@ -105,6 +105,17 @@
         </Strings>
       </Button>
 
+      <!-- Reset to Default Settings -->
+      <Button guid="Modes" id="ResetToDefaultsCommand" priority="0x0300" type="Button">
+        <Parent guid="Modes" id="ResetCommandsGroup" />
+        <Icon guid="ImageCatalogGuid" id="Refresh" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Reset to default settings...</ButtonText>
+          <LocCanonicalName>.Modes.ResetToDefaults</LocCanonicalName>
+        </Strings>
+      </Button>
+
       <!-- Settings -->
       <Button guid="Modes" id="SettingsCommand" priority="0x0100" type="Button">
         <Parent guid="Modes" id="SettingsCommandsGroup" />
@@ -141,6 +152,7 @@
       <IDSymbol name="DisableModeCommand" value="0x0106" />
       <IDSymbol name="ResetSettingsCommand" value="0x0104" />
       <IDSymbol name="SettingsCommand" value="0x0105" />
+      <IDSymbol name="ResetToDefaultsCommand" value="0x0107" />
     </GuidSymbol>
 
     <!-- UI Context GUIDs for rule-based autoloading -->

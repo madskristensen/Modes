@@ -72,6 +72,11 @@ namespace Modes
         public bool IsModeActive(ModeType mode) => _activeMode == mode;
 
         /// <summary>
+        /// Gets the file paths to all known mode settings files.
+        /// </summary>
+        public IEnumerable<string> ModeSettingsFiles => _modeSettingsFiles.Values;
+
+        /// <summary>
         /// Gets the currently active mode, if any.
         /// </summary>
         public ModeType? ActiveMode => _activeMode;

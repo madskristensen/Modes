@@ -42,6 +42,7 @@
     <Compile Include="Commands\DisableModeCommand.cs" />
     <Compile Include="Commands\PresenterCommand.cs" />
     <Compile Include="Commands\ResetSettingsCommand.cs" />
+    <Compile Include="Commands\ResetToDefaultsCommand.cs" />
     <Compile Include="Commands\SettingsCommand.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Dialogs\BackupSelectionDialog.xaml.cs">

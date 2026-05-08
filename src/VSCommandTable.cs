@@ -40,5 +40,6 @@ namespace Modes
         public const int DisableModeCommand = 0x0106;
         public const int ResetSettingsCommand = 0x0104;
         public const int SettingsCommand = 0x0105;
+        public const int ResetToDefaultsCommand = 0x0107;
     }
 }

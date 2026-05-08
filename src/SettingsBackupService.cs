@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -96,6 +97,13 @@ namespace Modes
                     return;
                 }
 
+                // First reset any FontsAndColors categories that the modes touch back to VS defaults.
+                // This ensures mode-applied fonts (e.g. the Output window font from Presenter mode)
+                // are reverted even when the backup file itself doesn't contain those font settings.
+                // The subsequent import then layers any font customizations the user had captured
+                // in the backup on top of the defaults.
+                await ResetModeAffectedFontsAsync();
+
                 await VS.Commands.ExecuteAsync("Tools.ImportandExportSettings", $"/import:\"{backupFilePath}\"");
                 await VS.StatusBar.ShowMessageAsync($"Restored settings from {Path.GetFileName(backupFilePath)}");
             }
@@ -103,6 +111,49 @@ namespace Modes
             {
                 await ex.LogAsync();
                 await VS.MessageBox.ShowErrorAsync("Modes", $"Failed to restore settings: {ex.Message}");
+            }
+        }
+
+        private async Task ResetModeAffectedFontsAsync()
+        {
+            try
+            {
+                HashSet<string> guids = await Task.Run(() =>
+                    SettingsFilter.CollectFontCategoryGuids(ModeManager.Instance.ModeSettingsFiles));
+
+                if (guids.Count == 0)
+                {
+                    return;
+                }
+
+                var resetFilePath = Path.Combine(_backupFolder, "font_reset.vssettings");
+
+                var written = await Task.Run(() =>
+                    SettingsFilter.WriteFontResetSettings(resetFilePath, guids));
+
+                if (!written)
+                {
+                    return;
+                }
+
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                await VS.Commands.ExecuteAsync("Tools.ImportandExportSettings", $"/import:\"{resetFilePath}\"");
+
+                try
+                {
+                    if (File.Exists(resetFilePath))
+                    {
+                        File.Delete(resetFilePath);
+                    }
+                }
+                catch
+                {
+                    // Best effort cleanup
+                }
+            }
+            catch (Exception ex)
+            {
+                await ex.LogAsync();
             }
         }
 

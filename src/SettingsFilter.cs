@@ -12,6 +12,120 @@ namespace Modes
     internal static class SettingsFilter
     {
         /// <summary>
+        /// Collects every FontsAndColors category GUID referenced by the supplied mode settings files.
+        /// </summary>
+        public static HashSet<string> CollectFontCategoryGuids(IEnumerable<string> modeSettingsPaths)
+        {
+            var guids = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var path in modeSettingsPaths)
+            {
+                if (string.IsNullOrEmpty(path) || !File.Exists(path))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    var doc = new XmlDocument();
+                    doc.Load(path);
+                    XmlNode root = doc.SelectSingleNode("/UserSettings");
+                    if (root == null)
+                    {
+                        continue;
+                    }
+
+                    foreach (var guid in BuildFontCategoryGuidsToKeep(root))
+                    {
+                        guids.Add(guid);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Failed to read mode settings '{path}': {ex.Message}");
+                }
+            }
+
+            return guids;
+        }
+
+        /// <summary>
+        /// Writes a .vssettings file that resets the supplied FontsAndColors category GUIDs to their VS defaults.
+        /// </summary>
+        public static bool WriteFontResetSettings(string destPath, IEnumerable<string> fontCategoryGuids)
+        {
+            if (fontCategoryGuids == null)
+            {
+                return false;
+            }
+
+            // Materialize once and bail if there's nothing to reset.
+            var guidList = new List<string>();
+            foreach (var guid in fontCategoryGuids)
+            {
+                if (!string.IsNullOrEmpty(guid))
+                {
+                    guidList.Add(guid);
+                }
+            }
+
+            if (guidList.Count == 0)
+            {
+                return false;
+            }
+
+            try
+            {
+                var doc = new XmlDocument();
+                XmlElement userSettings = doc.CreateElement("UserSettings");
+                doc.AppendChild(userSettings);
+
+                XmlElement appIdentity = doc.CreateElement("ApplicationIdentity");
+                appIdentity.SetAttribute("version", "18.0");
+                userSettings.AppendChild(appIdentity);
+
+                XmlElement envGroup = doc.CreateElement("Category");
+                envGroup.SetAttribute("name", "Environment_Group");
+                envGroup.SetAttribute("RegisteredName", "Environment_Group");
+                userSettings.AppendChild(envGroup);
+
+                XmlElement fontsCategory = doc.CreateElement("Category");
+                fontsCategory.SetAttribute("name", "Environment_FontsAndColors");
+                fontsCategory.SetAttribute("Category", "{1EDA5DD4-927A-43a7-810E-7FD247D0DA1D}");
+                fontsCategory.SetAttribute("Package", "{DA9FB551-C724-11d0-AE1F-00A0C90FFFC3}");
+                fontsCategory.SetAttribute("RegisteredName", "Environment_FontsAndColors");
+                fontsCategory.SetAttribute("PackageName", "CVsShellPackage");
+                envGroup.AppendChild(fontsCategory);
+
+                XmlElement fontsAndColors = doc.CreateElement("FontsAndColors");
+                fontsAndColors.SetAttribute("Version", "2.0");
+                fontsCategory.AppendChild(fontsAndColors);
+
+                foreach (var guid in guidList)
+                {
+                    XmlElement cat = doc.CreateElement("Category");
+                    cat.SetAttribute("GUID", guid);
+                    cat.SetAttribute("FontIsDefault", "Yes");
+                    fontsAndColors.AppendChild(cat);
+                }
+
+                var dir = Path.GetDirectoryName(destPath);
+                if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                }
+
+                doc.Save(destPath);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to write font reset settings: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Filters a vssettings file to only keep the exact properties defined in the mode's settings.
         /// </summary>
         /// <param name="sourcePath">Path to the full exported settings file.</param>
